@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Mail, Send, Slack, FileText } from "lucide-react"
+import { Mail, Send, Slack, FileText, ArrowLeft, Home } from "lucide-react"
 
 interface CommunicationData {
   title: string
@@ -40,6 +41,7 @@ const priorityTitles = {
 }
 
 export function CommunicationsTemplate() {
+  const router = useRouter()
   const [previewMode, setPreviewMode] = useState(false)
   const [isOutlookDialogOpen, setIsOutlookDialogOpen] = useState(false)
   const [isHyperlinkDialogOpen, setIsHyperlinkDialogOpen] = useState(false)
@@ -211,6 +213,89 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
     } catch (error) {
       console.error("[v0] Error in Gmail integration:", error)
       alert(`❌ Failed to open Gmail: ${error.message}`)
+    }
+  }
+
+  const sendViaAzure = async () => {
+    try {
+      console.log("[v0] Starting Azure email send...")
+
+      // Validate required fields
+      if (!emailSettings.recipients) {
+        alert("❌ Please enter at least one recipient email address")
+        return
+      }
+
+      if (!emailSettings.senderEmail) {
+        alert("❌ Please enter a sender email address")
+        return
+      }
+
+      // Generate the HTML email content
+      const htmlContent = generateEmailHTML()
+      const subject = emailSettings.customSubject || `${priorityTitles[commData.priority]}: ${commData.title}`
+
+      // Parse recipients (split by semicolon or comma)
+      const toEmails = emailSettings.recipients
+        .split(/[;,]/)
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0)
+
+      const ccEmails = emailSettings.ccRecipients
+        ? emailSettings.ccRecipients
+            .split(/[;,]/)
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0)
+        : undefined
+
+      const bccEmails = emailSettings.bccRecipients
+        ? emailSettings.bccRecipients
+            .split(/[;,]/)
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0)
+        : undefined
+
+      console.log("[v0] Sending email via Azure with:", {
+        from: emailSettings.senderEmail,
+        to: toEmails,
+        cc: ccEmails,
+        bcc: bccEmails,
+        subject,
+      })
+
+      // Call the Azure API
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fromEmail: emailSettings.senderEmail,
+          to: toEmails,
+          subject: subject,
+          htmlContent: htmlContent,
+          cc: ccEmails,
+          bcc: bccEmails,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        console.log("[v0] Email sent successfully via Azure:", result)
+        alert(
+          `✅ Email sent successfully via Azure!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered.`,
+        )
+        setIsOutlookDialogOpen(false)
+      } else {
+        console.error("[v0] Azure email send failed:", result)
+        alert(
+          `❌ Failed to send email via Azure:\n\n${result.error || "Unknown error"}\n\nPlease check:\n1. Azure app credentials are configured\n2. Sender email exists in your Azure AD\n3. API permissions are granted`,
+        )
+      }
+    } catch (error) {
+      console.error("[v0] Error sending via Azure:", error)
+      alert(`❌ Failed to send email via Azure: ${error.message}`)
     }
   }
 
@@ -909,9 +994,20 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
     return (
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white drop-shadow-lg bg-black/20 rounded-lg py-2 px-4">
-            Communication Preview
-          </h2>
+          <div className="flex items-center gap-4">
+            <Button
+              onClick={() => router.push("/")}
+              variant="outline"
+              size="sm"
+              className="bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Home
+            </Button>
+            <h2 className="text-2xl font-bold text-white drop-shadow-lg bg-black/20 rounded-lg py-2 px-4">
+              Communication Preview
+            </h2>
+          </div>
           <div className="flex gap-2">
             <Button
               onClick={exportAsPDF}
@@ -991,9 +1087,15 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       Open in Outlook
                     </Button>
                   </div>
-                  <Button onClick={copyHTMLToClipboard} className="w-full bg-green-600 hover:bg-green-700">
-                    📋 Copy HTML for Outlook
-                  </Button>
+                  <div className="mt-2">
+                    <Button onClick={sendViaAzure} className="w-full bg-green-600 hover:bg-green-700">
+                      <Send className="h-4 w-4 mr-2" />
+                      Send via Azure (Direct Send)
+                    </Button>
+                    <p className="text-xs text-gray-600 mt-2">
+                      Sends email directly through Microsoft Graph API using your Azure app credentials
+                    </p>
+                  </div>
                 </div>
               </DialogContent>
             </Dialog>
@@ -1105,7 +1207,18 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
       <Card className="bg-white/95 backdrop-blur-sm border border-white/20">
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-gray-900">✏️ Communication Editor</CardTitle>
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => router.push("/")}
+                variant="outline"
+                size="default"
+                className="bg-blue-600 text-white hover:bg-blue-700 border border-blue-600"
+              >
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Button>
+              <CardTitle className="flex items-center gap-2 text-gray-900">✏️ Communication Editor</CardTitle>
+            </div>
             <div className="flex gap-2">
               <Button
                 size="sm"
@@ -1114,14 +1227,6 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                 className="bg-white text-gray-900 hover:bg-gray-100 border border-gray-300"
               >
                 👁️ Full Preview
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={copyHTMLToClipboard}
-                className="bg-green-600 text-white hover:bg-green-700 border border-green-600"
-              >
-                📋 Copy HTML for Outlook
               </Button>
             </div>
           </div>
@@ -1369,7 +1474,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                   />
                 </div>
               </div>
-              <p className="text-gray-600 text-xs">Group Platform Engineering • {new Date().toLocaleDateString()}</p>
+              <p className="text-gray-600 text-sm">Group Platform Engineering • {new Date().toLocaleDateString()}</p>
             </div>
           </div>
         </CardContent>
