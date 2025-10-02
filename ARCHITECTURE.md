@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-The GPE Communications Hub is a Next.js-based web application designed to streamline the creation, formatting, and distribution of professional branded email communications for Group Platform Engineering teams. The application provides a rich text editor with formatting capabilities, file uploads, and direct email sending through Microsoft Azure Graph API.
+The GPE Communications Hub is a Next.js-based web application designed to streamline the creation, formatting, and distribution of professional branded email communications for Group Platform Engineering teams. The application provides a rich text editor with formatting capabilities, file uploads, direct email sending through Microsoft Azure Graph API, and planned integration with ServiceNow for change management visibility.
 
 ---
 
@@ -21,6 +21,7 @@ The GPE Communications Hub is a Next.js-based web application designed to stream
 - Manual email formatting is time-consuming and error-prone
 - No centralized tool for creating Sky-branded communications
 - Need for multiple export formats (PDF, Image, HTML, Email)
+- Lack of visibility into change management data
 
 ### User Needs
 - Quick creation of formatted communications
@@ -28,6 +29,7 @@ The GPE Communications Hub is a Next.js-based web application designed to stream
 - Direct email sending without leaving the application
 - Export options for various use cases
 - Preview before sending
+- Visibility into change management data
 
 ---
 
@@ -228,7 +230,207 @@ frontend:
 
 ---
 
-## 6. Design System
+## 6. ServiceNow Integration Architecture
+
+### 6.1 Overview
+**Status:** Planned Feature  
+**Purpose:** Integrate ServiceNow Change Management data to provide visibility into change restrictions and GPE manager change approvals within the communications tool.
+
+### 6.2 Data Sources
+
+**ServiceNow Tables:**
+- **Change Requests** (`change_request`) - Upcoming team changes requiring approval
+- **Change Restrictions** (`change_blackout` or custom table) - Blackout periods and restriction windows
+- **Approvals** (`sysapproval_approver`) - GPE manager approval queue
+
+**Data Requirements:**
+- Change request details (number, description, dates, status, assigned to)
+- Change restriction periods (start date, end date, type, description)
+- Approval status (pending, approved, rejected, approver, due date)
+- GPE manager identification (department, assignment group)
+
+### 6.3 Integration Architecture Decision
+
+**Decision:** Use Upstash Redis for ServiceNow data caching instead of Supabase
+
+**Context:**
+The application needs to fetch and display ServiceNow change management data including:
+- Change restrictions (blackout periods)
+- GPE manager change approvals
+- Upcoming team changes
+
+This data needs to be:
+- Refreshed periodically (every 15-30 minutes)
+- Shared across all users
+- Fast to retrieve
+- Cached to avoid ServiceNow API rate limits
+
+**Alternatives Considered:**
+
+1. **Supabase PostgreSQL Database**
+   - Pros: Relational data model, complex queries, already integrated
+   - Cons: Overkill for simple caching, requires schema management, slower than in-memory
+   - Rejected: User preference to avoid Supabase for this use case
+
+2. **Direct API Calls (No Caching)**
+   - Pros: Always fresh data, simple implementation
+   - Cons: Slow, may hit rate limits, higher ServiceNow load
+   - Rejected: Performance concerns and rate limiting risks
+
+3. **Client-Side Caching Only**
+   - Pros: No backend storage, simple
+   - Cons: Not shared between users, lost on refresh, each user hits API
+   - Rejected: Inefficient and poor user experience
+
+4. **Upstash Redis (Selected)**
+   - Pros: Fast in-memory storage, TTL support, serverless-friendly, shared cache
+   - Cons: Requires additional integration setup
+   - **Selected:** Best balance of performance, simplicity, and scalability
+
+**Decision Rationale:**
+- **Performance:** Redis provides sub-millisecond response times for cached data
+- **Serverless-Friendly:** Works seamlessly with Vercel/Amplify deployments
+- **TTL Support:** Automatic cache expiration ensures data freshness
+- **Shared Cache:** All users benefit from cached data, reducing ServiceNow API calls
+- **Integration Available:** Upstash for Redis integration already available in the project
+- **Simplicity:** Key-value storage perfect for caching JSON responses
+
+### 6.4 Technical Implementation
+
+**Caching Strategy:**
+\`\`\`typescript
+// Cache keys structure
+servicenow:change_requests     → JSON array of change requests
+servicenow:change_restrictions → JSON array of restrictions
+servicenow:approvals:gpe       → JSON array of GPE manager approvals
+servicenow:last_sync           → ISO timestamp of last sync
+\`\`\`
+
+**Cache Flow:**
+\`\`\`
+User Request → Next.js API Route
+    ↓
+Check Redis Cache
+    ↓
+Cache Hit (< 15 min old)?
+    ↓ Yes                    ↓ No
+Return Cached Data    Fetch from ServiceNow API
+                             ↓
+                      Store in Redis (TTL: 15 min)
+                             ↓
+                      Return Fresh Data
+\`\`\`
+
+**API Routes:**
+- `/api/servicenow/changes` - Fetch change requests
+- `/api/servicenow/restrictions` - Fetch change restrictions
+- `/api/servicenow/approvals` - Fetch GPE manager approvals
+- `/api/servicenow/sync` - Manual sync trigger
+
+**ServiceNow Authentication:**
+- Method: OAuth 2.0 or Basic Auth
+- Credentials stored in environment variables
+- Token refresh handling for OAuth
+
+### 6.5 Calendar Component
+
+**Purpose:** Unified view of change restrictions and approvals
+
+**Features:**
+- Full calendar view (month/week/day)
+- Color-coded events:
+  - 🔴 Change Restrictions (red/orange)
+  - 🟢 Approved Changes (green)
+  - 🟡 Pending Approvals (yellow)
+  - ⚫ Rejected Changes (gray)
+- Event details on click
+- Filter by type, manager, status
+- Export to iCal/Google Calendar
+- Date range selection
+
+**Component Location:** `components/servicenow-calendar.tsx`
+
+**Data Structure:**
+\`\`\`typescript
+interface CalendarEvent {
+  id: string
+  type: 'restriction' | 'approval' | 'change'
+  title: string
+  description: string
+  startDate: Date
+  endDate: Date
+  status: 'pending' | 'approved' | 'rejected' | 'active'
+  manager?: string
+  changeNumber?: string
+  priority?: 'low' | 'medium' | 'high'
+}
+\`\`\`
+
+### 6.6 Environment Variables
+
+**Required for ServiceNow Integration:**
+\`\`\`env
+# ServiceNow API Configuration
+SERVICENOW_INSTANCE_URL=https://yourcompany.service-now.com
+SERVICENOW_CLIENT_ID=your-client-id
+SERVICENOW_CLIENT_SECRET=your-client-secret
+# OR for Basic Auth
+SERVICENOW_USERNAME=your-username
+SERVICENOW_PASSWORD=your-password
+
+# Upstash Redis (for caching)
+KV_REST_API_URL=your-upstash-url
+KV_REST_API_TOKEN=your-upstash-token
+\`\`\`
+
+### 6.7 Sync Mechanism
+
+**Automatic Sync:**
+- Background job runs every 15 minutes
+- Implemented via Next.js API route with cron trigger
+- Updates Redis cache with fresh ServiceNow data
+
+**Manual Sync:**
+- Refresh button in UI
+- Triggers immediate sync
+- Shows last sync timestamp
+
+**Error Handling:**
+- Fallback to cached data if ServiceNow unavailable
+- User notification of stale data
+- Retry logic with exponential backoff
+
+### 6.8 Security Considerations
+
+**API Security:**
+- ServiceNow credentials stored as environment variables
+- Server-side only API calls (no client exposure)
+- Rate limiting on sync endpoints
+- Input validation on all ServiceNow responses
+
+**Data Privacy:**
+- Only fetch necessary fields
+- No sensitive data stored in Redis
+- Cache expiration ensures data freshness
+- Audit logging of data access
+
+### 6.9 Performance Metrics
+
+**Target Performance:**
+- Cache hit response time: < 100ms
+- Cache miss (ServiceNow fetch): < 2s
+- Calendar render time: < 500ms
+- Sync operation: < 5s
+
+**Monitoring:**
+- Cache hit/miss ratio
+- ServiceNow API response times
+- Sync success/failure rates
+- Redis connection health
+
+---
+
+## 7. Design System
 
 ### Color Palette
 **Primary Brand Colors:**
@@ -262,54 +464,84 @@ frontend:
 
 ---
 
-## 7. Key Technical Decisions
+## 8. Key Technical Decisions
 
-### 7.1 Why Next.js App Router?
+### 8.1 Why Next.js App Router?
 - Modern routing patterns
 - Server components for better performance
 - API routes for backend logic
 - Built-in optimization
 - Vercel/Amplify deployment support
 
-### 7.2 Why Microsoft Graph API for Email?
+### 8.2 Why Microsoft Graph API for Email?
 - Enterprise-grade email delivery
 - Azure AD integration
 - Supports shared mailboxes
 - Better deliverability than SMTP
 - Audit trail and compliance
 
-### 7.3 Why Canvas for Image Generation?
+### 8.3 Why Canvas for Image Generation?
 - No external dependencies for basic images
 - Full control over rendering
 - Works in browser
 - High-quality output
 - Gradient support
 
-### 7.4 Why jsPDF for PDF Export?
+### 8.4 Why jsPDF for PDF Export?
 - Lightweight library
 - Client-side generation
 - Clickable links support
 - Good documentation
 - Active maintenance
 
-### 7.5 Why shadcn/ui?
+### 8.5 Why shadcn/ui?
 - Accessible components
 - Customizable
 - TypeScript support
 - Radix UI primitives
 - Copy-paste approach (no npm bloat)
 
+### 8.6 Why Upstash Redis for ServiceNow Caching?
+**Decision:** Use Upstash Redis instead of Supabase for caching ServiceNow data
+
+**Rationale:**
+- **Performance:** In-memory storage provides sub-millisecond response times
+- **Serverless-Friendly:** No connection pooling issues, works with edge functions
+- **TTL Support:** Automatic cache expiration without manual cleanup
+- **Simplicity:** Key-value storage perfect for JSON caching
+- **Cost-Effective:** Pay only for what you use
+- **Integration Available:** Already supported in the project ecosystem
+
+**Consequences:**
+- Positive: Fast data retrieval, reduced ServiceNow API calls, better user experience
+- Positive: Automatic cache invalidation via TTL
+- Positive: Scales effortlessly with user growth
+- Negative: Additional service dependency (Upstash)
+- Negative: Data is ephemeral (not suitable for permanent storage)
+- Mitigation: ServiceNow remains source of truth, Redis is cache only
+
 ---
 
-## 8. File Structure
+## 9. File Structure
 
 \`\`\`
 ├── app/
 │   ├── api/
-│   │   └── send-email/
-│   │       └── route.ts          # Email sending API endpoint
+│   │   ├── send-email/
+│   │   │   └── route.ts          # Email sending API endpoint
+│   │   └── servicenow/           # ServiceNow integration (planned)
+│   │       ├── changes/
+│   │       │   └── route.ts      # Fetch change requests
+│   │       ├── restrictions/
+│   │       │   └── route.ts      # Fetch change restrictions
+│   │       ├── approvals/
+│   │       │   └── route.ts      # Fetch GPE approvals
+│   │       └── sync/
+│   │           └── route.ts      # Manual sync trigger
 │   ├── communications/
 │   │   └── page.tsx               # Communications builder page
+│   ├── calendar/                  # ServiceNow calendar (planned)
+│   │   └── page.tsx               # Calendar view page
 │   ├── globals.css                # Global styles & Tailwind config
 │   ├── layout.tsx                 # Root layout
 │   └── page.tsx                   # Landing page
@@ -317,10 +549,13 @@ frontend:
 │   ├── auth/                      # Authentication components (unused)
 │   ├── communications-template.tsx # Main communications editor
 │   ├── rich-text-editor.tsx       # Rich text editing component
+│   ├── servicenow-calendar.tsx    # Calendar component (planned)
 │   ├── ui/                        # shadcn/ui components
 │   └── ...
 ├── lib/
 │   ├── microsoft-graph.ts         # Microsoft Graph API service
+│   ├── servicenow.ts              # ServiceNow API service (planned)
+│   ├── redis.ts                   # Upstash Redis client (planned)
 │   ├── supabase/                  # Supabase integration (unused)
 │   └── utils.ts                   # Utility functions
 ├── public/
@@ -334,7 +569,7 @@ frontend:
 
 ---
 
-## 9. Dependencies
+## 10. Dependencies
 
 ### Core Dependencies
 - `next`: 15.2.4 - Framework
@@ -353,10 +588,12 @@ frontend:
 - `@supabase/supabase-js` - Database (available)
 - `date-fns` - Date formatting
 - `zod` - Schema validation
+- `@upstash/redis` - Redis caching (planned)
+- `react-big-calendar` or `@fullcalendar/react` - Calendar UI (planned)
 
 ---
 
-## 10. Environment Configuration
+## 11. Environment Configuration
 
 ### Required Environment Variables
 \`\`\`env
@@ -364,6 +601,15 @@ frontend:
 MICROSOFT_CLIENT_ID=your-client-id
 MICROSOFT_TENANT_ID=your-tenant-id
 MICROSOFT_CLIENT_SECRET=your-client-secret
+
+# ServiceNow Integration (Planned)
+SERVICENOW_INSTANCE_URL=https://yourcompany.service-now.com
+SERVICENOW_CLIENT_ID=your-client-id
+SERVICENOW_CLIENT_SECRET=your-client-secret
+
+# Upstash Redis (Planned)
+KV_REST_API_URL=your-upstash-url
+KV_REST_API_TOKEN=your-upstash-token
 
 # Supabase (Available but not used)
 SUPABASE_URL=your-supabase-url
@@ -385,7 +631,7 @@ POSTGRES_HOST=your-host
 
 ---
 
-## 11. Known Limitations & Future Improvements
+## 12. Known Limitations & Future Improvements
 
 ### Current Limitations
 1. No user authentication implemented
@@ -394,6 +640,7 @@ POSTGRES_HOST=your-host
 4. Single-user mode only
 5. No draft saving
 6. Limited to email sending (no SMS, Slack direct integration)
+7. ServiceNow integration not yet implemented
 
 ### Planned Improvements
 1. **User Authentication**
@@ -404,101 +651,31 @@ POSTGRES_HOST=your-host
    - Save drafts to database
    - Communication history
    - Template library
+
+3. **ServiceNow Integration**
+   - Change restriction visibility
+   - GPE manager approval queue
+   - Unified calendar view
+   - Automatic sync with Redis caching
    
-3. **Enhanced Editor**
+4. **Enhanced Editor**
    - Table support
    - Image editing
    - More formatting options
    
-4. **Collaboration**
+5. **Collaboration**
    - Multi-user editing
    - Comments and approvals
    - Version control
    
-5. **Analytics**
+6. **Analytics**
    - Email open tracking
    - Click tracking
    - Engagement metrics
 
 ---
 
-## 12. Security Considerations
-
-### Current Security Measures
-1. **API Route Protection**
-   - Server-side only email sending
-   - Environment variables for secrets
-   
-2. **Input Validation**
-   - Email format validation
-   - File type restrictions
-   
-3. **Authentication**
-   - Microsoft Graph OAuth 2.0
-   - Client credentials flow
-
-### Future Security Enhancements
-1. Implement user authentication
-2. Rate limiting on email sending
-3. CSRF protection
-4. Content sanitization
-5. Audit logging
-
----
-
-## 13. Performance Considerations
-
-### Current Optimizations
-1. **Next.js Optimizations**
-   - Server-side rendering
-   - Image optimization
-   - Code splitting
-   
-2. **Caching**
-   - Build cache in Amplify
-   - Static asset caching
-   
-3. **Bundle Size**
-   - Dynamic imports for jsPDF
-   - Tree shaking
-   - Minimal dependencies
-
-### Performance Metrics
-- Lighthouse Score: Target 90+
-- First Contentful Paint: < 1.5s
-- Time to Interactive: < 3s
-
----
-
-## 14. Testing Strategy
-
-### Current State
-**Status:** No automated tests implemented
-
-### Recommended Testing Approach
-1. **Unit Tests**
-   - Rich text editor formatting
-   - Email HTML generation
-   - Utility functions
-   
-2. **Integration Tests**
-   - Email sending flow
-   - Export functionality
-   - API routes
-   
-3. **E2E Tests**
-   - Complete communication creation
-   - Email sending workflow
-   - Export workflows
-
-### Testing Tools (Recommended)
-- Jest for unit tests
-- React Testing Library for component tests
-- Playwright for E2E tests
-
----
-
-## 15. Monitoring & Observability
+## 13. Monitoring & Observability
 
 ### Current State
 **Status:** Basic logging only
@@ -522,7 +699,7 @@ POSTGRES_HOST=your-host
 
 ---
 
-## 16. Compliance & Accessibility
+## 14. Compliance & Accessibility
 
 ### Accessibility
 - **WCAG 2.1 Level AA** target
@@ -539,7 +716,7 @@ POSTGRES_HOST=your-host
 
 ---
 
-## 17. Maintenance & Support
+## 15. Maintenance & Support
 
 ### Code Maintenance
 - **Framework Updates:** Quarterly Next.js updates
@@ -559,9 +736,9 @@ POSTGRES_HOST=your-host
 
 ---
 
-## 18. Conclusion
+## 16. Conclusion
 
-The GPE Communications Hub successfully provides a streamlined solution for creating professional branded email communications. The architecture leverages modern web technologies (Next.js, React, Tailwind) with enterprise-grade email delivery (Microsoft Graph API) to deliver a robust, user-friendly application.
+The GPE Communications Hub successfully provides a streamlined solution for creating professional branded email communications. The architecture leverages modern web technologies (Next.js, React, Tailwind) with enterprise-grade email delivery (Microsoft Graph API) and planned ServiceNow integration for change management visibility to deliver a robust, user-friendly application.
 
 ### Key Strengths
 - Modern, maintainable codebase
@@ -569,16 +746,19 @@ The GPE Communications Hub successfully provides a streamlined solution for crea
 - Multiple export formats
 - Professional branding integration
 - Scalable architecture
+- Strategic caching architecture with Upstash Redis for optimal performance
 
 ### Next Steps
-1. Implement user authentication
-2. Add communication storage
-3. Build template library
-4. Enhance collaboration features
-5. Add analytics and tracking
+1. Implement ServiceNow integration with Upstash Redis caching
+2. Build calendar component for change visibility
+3. Implement user authentication
+4. Add communication storage
+5. Build template library
+6. Enhance collaboration features
+7. Add analytics and tracking
 
 ---
 
-**Document Version:** 1.0  
+**Document Version:** 1.1  
 **Last Reviewed:** February 10, 2025  
 **Next Review:** May 10, 2025
