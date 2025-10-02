@@ -142,80 +142,6 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
     return plainText
   }
 
-  const sendViaOutlook = async () => {
-    const subject = emailSettings.customSubject || `${priorityTitles[commData.priority]}: ${commData.title}`
-
-    try {
-      // Generate the image first
-      const imageBlob = await generateCommunicationImage()
-
-      // Create a data URL for the image
-      const imageDataUrl = await new Promise<string>((resolve) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.readAsDataURL(imageBlob)
-      })
-
-      // Create HTML email body with embedded image
-      const htmlBody = `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <p>Dear Team,</p>
-          <p>Please see the communication below:</p>
-          <img src="${imageDataUrl}" alt="Communication" style="max-width: 100%; height: auto; border: 1px solid #ddd; border-radius: 8px;" />
-          <p>Best regards,<br/>Group Platform Engineering</p>
-        </div>
-      `
-
-      const mailtoParams = new URLSearchParams()
-      if (emailSettings.recipients) mailtoParams.set("to", emailSettings.recipients)
-      if (emailSettings.ccRecipients) mailtoParams.set("cc", emailSettings.ccRecipients)
-      if (emailSettings.bccRecipients) mailtoParams.set("bcc", emailSettings.bccRecipients)
-      mailtoParams.set("subject", subject)
-      mailtoParams.set("body", htmlBody)
-
-      const mailtoUrl = `mailto:${emailSettings.recipients}?${mailtoParams.toString()}`
-      window.location.href = mailtoUrl
-      setIsOutlookDialogOpen(false)
-
-      setTimeout(() => {
-        alert(
-          `Opening Outlook with your visual communication embedded!\n\nIMPORTANT: Please manually change the "From" field to: ${emailSettings.senderEmail}\n\nThe communication image is embedded in the email body.`,
-        )
-      }, 500)
-    } catch (error) {
-      console.error("Error creating visual email:", error)
-      alert("Unable to create visual email. Please try the image export option instead.")
-    }
-  }
-
-  const sendViaGmail = async () => {
-    try {
-      console.log("[v0] Starting Gmail integration...")
-
-      // Always download the image first
-      const success = await downloadImage()
-      if (!success) {
-        return
-      }
-
-      // Create minimal email with focus on the attached image
-      const subject = encodeURIComponent(commData.title || "Communication")
-      const body = encodeURIComponent(`Please see the attached styled communication image.`)
-
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`
-
-      console.log("[v0] Opening Gmail...")
-      window.open(gmailUrl, "_blank")
-
-      alert(
-        "📧 Gmail opened! The styled communication image has been downloaded. Please attach it to your email - this image contains all the beautiful formatting, colors, and graphics from your preview.",
-      )
-    } catch (error) {
-      console.error("[v0] Error in Gmail integration:", error)
-      alert(`❌ Failed to open Gmail: ${error.message}`)
-    }
-  }
-
   const sendViaAzure = async () => {
     try {
       console.log("[v0] Starting Azure email send...")
@@ -1026,7 +952,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Send via Email Client</DialogTitle>
+                  <DialogTitle>Send via Azure</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -1035,10 +961,10 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       id="sender"
                       value={emailSettings.senderEmail}
                       onChange={(e) => updateEmailSetting("senderEmail", e.target.value)}
-                      placeholder="noreply@yourcompany.com"
+                      placeholder="your-mailbox@yourcompany.com"
                     />
                     <p className="text-xs text-gray-600">
-                      Note: You'll need to manually select this sender in your email client
+                      Must be a valid email address in your Azure AD (user or shared mailbox)
                     </p>
                   </div>
                   <div className="space-y-2">
@@ -1049,6 +975,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       onChange={(e) => updateEmailSetting("recipients", e.target.value)}
                       placeholder="email1@company.com; email2@company.com"
                     />
+                    <p className="text-xs text-gray-600">Separate multiple recipients with semicolons or commas</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="cc">CC (Optional)</Label>
@@ -1077,20 +1004,10 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       placeholder={`${priorityTitles[commData.priority]}: ${commData.title}`}
                     />
                   </div>
-                  <div className="flex gap-2">
-                    <Button onClick={sendViaGmail} className="flex-1 bg-red-600 hover:bg-red-700">
-                      <Send className="h-4 w-4 mr-2" />
-                      Open in Gmail
-                    </Button>
-                    <Button onClick={sendViaOutlook} className="flex-1 bg-blue-600 hover:bg-blue-700">
-                      <Send className="h-4 w-4 mr-2" />
-                      Open in Outlook
-                    </Button>
-                  </div>
                   <div className="mt-2">
-                    <Button onClick={sendViaAzure} className="w-full bg-green-600 hover:bg-green-700">
+                    <Button onClick={sendViaAzure} className="w-full bg-blue-600 hover:bg-blue-700">
                       <Send className="h-4 w-4 mr-2" />
-                      Send via Azure (Direct Send)
+                      Send via Azure
                     </Button>
                     <p className="text-xs text-gray-600 mt-2">
                       Sends email directly through Microsoft Graph API using your Azure app credentials
