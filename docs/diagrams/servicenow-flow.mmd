@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant User
+    participant NextJS
+    participant Redis
+    participant ServiceNow
+    
+    User->>NextJS: Request Calendar Data
+    NextJS->>Redis: Check Cache
+    alt Cache Hit
+        Redis->>NextJS: Return Cached Data
+    else Cache Miss
+        NextJS->>ServiceNow: API Request
+        ServiceNow->>NextJS: Return Data
+        NextJS->>Redis: Store in Cache
+    end
+    NextJS->>User: Display Calendar

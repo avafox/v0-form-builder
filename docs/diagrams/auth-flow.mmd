@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant User
+    participant Amplify
+    participant EntraID
+    participant Graph
+    participant Redis
+    
+    User->>Amplify: 1. Access App
+    Amplify->>EntraID: 2. Redirect to Login
+    EntraID->>User: 3. Login Page
+    User->>EntraID: 4. Enter Credentials
+    EntraID->>Amplify: 5. OAuth Token
+    Amplify->>Graph: 6. Get User Groups
+    Graph->>Redis: 7. Cache Groups
+    Redis->>Amplify: 8. Return Access Decision
+    Amplify->>User: 9. Show App or Deny

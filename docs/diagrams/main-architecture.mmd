@@ -1,0 +1,23 @@
+graph TB
+    Users[Internal Users via VPN]
+    R53[Route 53 Private DNS]
+    WAF[AWS WAF IP Filter]
+    Amplify[AWS Amplify Next.js App]
+    Redis[Upstash Redis Cache]
+    EntraID[Microsoft Entra ID]
+    Graph[Microsoft Graph API]
+    SNOW[ServiceNow API]
+    
+    Users --> R53
+    R53 --> WAF
+    WAF --> Amplify
+    Amplify --> EntraID
+    Amplify --> Redis
+    Amplify --> Graph
+    Amplify --> SNOW
+    Graph --> EntraID
+    
+    style Amplify fill:#FF9900
+    style EntraID fill:#0078D4
+    style Redis fill:#DC382D
+    style SNOW fill:#62D84E
