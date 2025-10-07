@@ -99,3 +99,43 @@ export class MicrosoftGraphService {
     }
   }
 }
+
+export async function getUserGroups(userEmail: string, accessToken?: string): Promise<string[]> {
+  try {
+    // If no access token provided, use application credentials (fallback)
+    let token = accessToken
+
+    if (!token) {
+      const service = new MicrosoftGraphService({
+        clientId: process.env.MICROSOFT_CLIENT_ID!,
+        tenantId: process.env.MICROSOFT_TENANT_ID!,
+        clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      })
+      token = await service.getAccessToken()
+    }
+
+    // Get user's group memberships
+    const response = await fetch(
+      `https://graph.microsoft.com/v1.0/users/${userEmail}/memberOf?$select=id,displayName`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(`Failed to get user groups: ${error.error?.message}`)
+    }
+
+    const data = await response.json()
+
+    // Return array of group IDs
+    return data.value.map((group: { id: string }) => group.id)
+  } catch (error) {
+    console.error("[v0] Failed to get user groups:", error)
+    throw error
+  }
+}
