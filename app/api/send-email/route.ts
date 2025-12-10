@@ -1,6 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { AWSSESEmailService } from "@/lib/aws-ses-email"
 
+export const runtime = "nodejs"
+
 export async function POST(request: NextRequest) {
   try {
     console.log("[v0] Received email send request")
