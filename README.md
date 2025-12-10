@@ -27,14 +27,14 @@ This app allows the GPE team to create, manage, and send professional email comm
 
 ## Environment Variables
 
-Required environment variables:
+### For Local Development (v0 Preview)
 
 \`\`\`bash
 # AWS SES (Email Sending)
 AWS_REGION=eu-west-2
 AWS_ACCESS_KEY_ID=your-access-key
 AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_SES_FROM_EMAIL=ava.foxwell@sky.uk
+AWS_SES_FROM_EMAIL=cti-gpe-communications@sky.uk
 AWS_SES_FROM_NAME=GPE Communications Team
 
 # Azure AD (Authentication Only)
@@ -52,6 +52,31 @@ KV_URL=your-kv-url
 KV_REST_API_TOKEN=your-token
 \`\`\`
 
+### For AWS Amplify Deployment
+
+**Important:** AWS Amplify does not allow environment variables starting with `AWS_`. Use `SES_` prefix instead:
+
+\`\`\`bash
+# AWS SES (Email Sending) - Use SES_ prefix for Amplify
+SES_REGION=eu-west-2
+SES_ACCESS_KEY_ID=your-access-key
+SES_SECRET_ACCESS_KEY=your-secret-key
+SES_FROM_EMAIL=cti-gpe-communications@sky.uk
+SES_FROM_NAME=GPE Communications Team
+
+# Azure AD (Authentication Only)
+MICROSOFT_CLIENT_ID=your-client-id
+MICROSOFT_TENANT_ID=your-tenant-id
+MICROSOFT_CLIENT_SECRET=your-client-secret
+
+# Database (Supabase)
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+\`\`\`
+
+See [docs/AMPLIFY_ENVIRONMENT_VARIABLES.md](./docs/AMPLIFY_ENVIRONMENT_VARIABLES.md) for detailed Amplify setup.
+
 ## Setup
 
 ### 1. AWS SES Configuration
@@ -59,7 +84,7 @@ KV_REST_API_TOKEN=your-token
 See [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for detailed setup instructions.
 
 Quick steps:
-1. Verify email address `ava.foxwell@sky.uk` in AWS SES
+1. Verify email address `cti-gpe-communications@sky.uk` in AWS SES
 2. Create IAM user with SES permissions
 3. Add AWS credentials to environment variables
 4. Request production access (to send to any email)
@@ -105,11 +130,15 @@ npx tsx scripts/test-aws-ses.tsx
 
 ## Deployment
 
-The app is configured for AWS Amplify deployment:
+The app is configured for AWS Amplify deployment. See [docs/DEPLOY_FROM_REPO.md](./docs/DEPLOY_FROM_REPO.md) for step-by-step instructions.
 
-1. Connect your GitHub repository to Amplify
-2. Configure environment variables in Amplify console
-3. Deploy automatically on push to main branch
+Quick steps:
+1. Push code to GitHub repository
+2. Connect repository to AWS Amplify
+3. Configure environment variables (use `SES_` prefix)
+4. Deploy automatically on push to main branch
+
+**Important:** Use `SES_` prefix for all SES-related variables in Amplify (not `AWS_` prefix).
 
 ## Architecture
 
@@ -139,6 +168,7 @@ User creates email → App validates → AWS SES sends → Recipient receives
 - AWS IAM for SES permissions
 - HTTPS only in production
 - No email credentials stored in app
+- npm dependencies pinned to exact versions (Sky security requirement)
 
 ## Cost
 
@@ -146,11 +176,20 @@ User creates email → App validates → AWS SES sends → Recipient receives
 - Very cost-effective for internal communications
 - See [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for detailed pricing
 
+## Documentation
+
+- [AWS SES Setup Guide](./docs/AWS_SES_SETUP.md)
+- [Amplify Deployment Guide](./docs/DEPLOY_FROM_REPO.md)
+- [Amplify Environment Variables](./docs/AMPLIFY_ENVIRONMENT_VARIABLES.md)
+- [Email Configuration](./docs/EMAIL_CONFIGURATION.md)
+- [Troubleshooting](./docs/TROUBLESHOOTING_AMPLIFY.md)
+
 ## Support
 
 For issues or questions:
-1. Check [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for troubleshooting
-2. Contact the development team
+1. Check documentation in [docs/](./docs/) folder
+2. Review [docs/TROUBLESHOOTING_AMPLIFY.md](./docs/TROUBLESHOOTING_AMPLIFY.md)
+3. Contact the development team
 
 ## Deployment Status
 
