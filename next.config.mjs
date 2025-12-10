@@ -9,7 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: 'standalone',
+  // Amplify handles the deployment differently than standalone mode expects
 }
 
 export default nextConfig
