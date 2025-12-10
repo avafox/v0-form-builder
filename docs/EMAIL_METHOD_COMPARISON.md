@@ -263,7 +263,7 @@ This document compares the two email sending methods available in the GPE Commun
    \`\`\`
 
 2. **Grant "Send As" permission**
-   ```powershell
+   \`\`\`powershell
    Add-RecipientPermission -Identity "shared-mailbox@company.com" `
      -Trustee "Your App Name" -AccessRights SendAs
    \`\`\`
