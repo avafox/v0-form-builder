@@ -3,7 +3,11 @@ frontend:
   phases:
     preBuild:
       commands:
-        # Install dependencies with exact versions (security requirement)
+        - |
+          if [ ! -f package-lock.json ]; then
+            echo "No package-lock.json found, generating..."
+            npm install --package-lock-only --legacy-peer-deps
+          fi
         - npm ci --legacy-peer-deps
     build:
       commands:
