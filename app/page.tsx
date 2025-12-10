@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Sparkles, Zap, FileCheck } from "lucide-react"
@@ -9,7 +8,9 @@ export default function HomePage() {
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="container mx-auto px-6 py-4">
-          <Image src="/sky-logo.png" alt="Sky Logo" width={80} height={40} className="h-10 w-auto" priority />
+          <div className="text-2xl font-bold bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 bg-clip-text text-transparent">
+            Sky GPE
+          </div>
         </div>
       </header>
 
@@ -101,7 +102,9 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t border-gray-200 bg-gray-50 py-8">
         <div className="container mx-auto px-6 text-center">
-          <Image src="/sky-logo.png" alt="Sky Logo" width={60} height={30} className="h-8 w-auto mx-auto mb-4" />
+          <div className="text-xl font-bold bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 bg-clip-text text-transparent mb-4">
+            Sky GPE
+          </div>
           <p className="text-gray-600 text-sm">© {new Date().getFullYear()} Sky. GPE Communications Hub.</p>
         </div>
       </footer>
