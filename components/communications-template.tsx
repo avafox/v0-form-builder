@@ -51,7 +51,7 @@ export function CommunicationsTemplate() {
     ccRecipients: "",
     bccRecipients: "",
     customSubject: "",
-    senderEmail: "noreply@yourcompany.com", // Replace with your actual no-reply address
+    senderEmail: "cti-gpe-communications@sky.uk",
   })
   const [commData, setCommData] = useState<CommunicationData>({
     title: "System Maintenance Notification",
@@ -144,7 +144,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
 
   const sendViaAzure = async () => {
     try {
-      console.log("[v0] Starting Azure email send...")
+      console.log("[v0] Starting SES email send...")
 
       // Validate required fields
       if (!emailSettings.recipients) {
@@ -181,7 +181,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
             .filter((email) => email.length > 0)
         : undefined
 
-      console.log("[v0] Sending email via Azure with:", {
+      console.log("[v0] Sending email via SES with:", {
         from: emailSettings.senderEmail,
         to: toEmails,
         cc: ccEmails,
@@ -189,7 +189,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
         subject,
       })
 
-      // Call the Azure API
+      // Call the SES API
       const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
@@ -208,20 +208,20 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
       const result = await response.json()
 
       if (response.ok) {
-        console.log("[v0] Email sent successfully via Azure:", result)
+        console.log("[v0] Email sent successfully via SES:", result)
         alert(
-          `✅ Email sent successfully via Azure!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered.`,
+          `✅ Email sent successfully!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered via AWS SES.`,
         )
         setIsOutlookDialogOpen(false)
       } else {
-        console.error("[v0] Azure email send failed:", result)
+        console.error("[v0] SES email send failed:", result)
         alert(
-          `❌ Failed to send email via Azure:\n\n${result.error || "Unknown error"}\n\nPlease check:\n1. Azure app credentials are configured\n2. Sender email exists in your Azure AD\n3. API permissions are granted`,
+          `❌ Failed to send email:\n\n${result.error || "Unknown error"}\n\nPlease check:\n1. AWS SES credentials are configured\n2. Sender email is verified in AWS SES\n3. You have production access (or recipient is verified)`,
         )
       }
     } catch (error) {
-      console.error("[v0] Error sending via Azure:", error)
-      alert(`❌ Failed to send email via Azure: ${error.message}`)
+      console.error("[v0] Error sending via SES:", error)
+      alert(`❌ Failed to send email: ${error.message}`)
     }
   }
 
@@ -472,7 +472,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
           )
         }
 
-        logoImg.src = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CNyi24McGgxSB1Qcsr3TNXt5cIF98u.png"
+        logoImg.src = "/images/image.png"
       } catch (error) {
         reject(error)
       }
@@ -525,7 +525,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
       const loadLogo = new Promise<void>((resolve) => {
         logoImg.onload = () => resolve()
         logoImg.onerror = () => resolve() // Continue even if logo fails to load
-        logoImg.src = "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CNyi24McGgxSB1Qcsr3TNXt5cIF98u.png"
+        logoImg.src = "/images/image.png"
       })
 
       await loadLogo
@@ -840,7 +840,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                     
                     <tr>
                         <td style="background-color: #f3f4f6; padding: 16px; text-align: center; border-radius: 0 0 8px 8px;">
-                            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CNyi24McGgxSB1Qcsr3TNXt5cIF98u.png" alt="Group Platform Engineering" style="max-width: 100%; height: auto; display: block; margin: 0 auto 8px auto;" />
+                            <img src="/images/image.png" alt="Group Platform Engineering" style="max-width: 100%; height: auto; display: block; margin: 0 auto 8px auto;" />
                             <p style="margin: 0; color: #6b7280; font-size: 14px; font-family: Arial, Helvetica, sans-serif; line-height: 1.4;">Group Platform Engineering • ${new Date().toLocaleDateString()}</p>
                         </td>
                     </tr>
@@ -916,6 +916,14 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
     return `mailto:${email}?subject=${subject}&body=${body}`
   }
 
+  const sendViaOutlook = () => {
+    setEmailSettings((prev) => ({
+      ...prev,
+      customSubject: `${priorityTitles[commData.priority]}: ${commData.title}`,
+    }))
+    setIsOutlookDialogOpen(true)
+  }
+
   if (previewMode) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -952,7 +960,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Send via Azure</DialogTitle>
+                  <DialogTitle>Send via AWS SES</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -960,12 +968,11 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                     <Input
                       id="sender"
                       value={emailSettings.senderEmail}
-                      onChange={(e) => updateEmailSetting("senderEmail", e.target.value)}
-                      placeholder="your-mailbox@yourcompany.com"
+                      readOnly
+                      className="bg-gray-50"
+                      placeholder="cti-gpe-communications@sky.uk"
                     />
-                    <p className="text-xs text-gray-600">
-                      Must be a valid email address in your Azure AD (user or shared mailbox)
-                    </p>
+                    <p className="text-xs text-gray-600">Verified AWS SES sender address</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="recipients">To (Recipients)</Label>
@@ -1007,11 +1014,9 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                   <div className="mt-2">
                     <Button onClick={sendViaAzure} className="w-full bg-blue-600 hover:bg-blue-700">
                       <Send className="h-4 w-4 mr-2" />
-                      Send via Azure
+                      Send via AWS SES
                     </Button>
-                    <p className="text-xs text-gray-600 mt-2">
-                      Sends email directly through Microsoft Graph API using your Azure app credentials
-                    </p>
+                    <p className="text-xs text-gray-600 mt-2">Sends email through AWS Simple Email Service (SES)</p>
                   </div>
                 </div>
               </DialogContent>
@@ -1105,7 +1110,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
             <div className="bg-white rounded-lg p-6 inline-block mb-2 shadow-sm border border-gray-200">
               <div className="bg-white p-2 rounded">
                 <img
-                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CNyi24McGgxSB1Qcsr3TNXt5cIF98u.png"
+                  src="/images/image.png"
                   alt="Group Platform Engineering"
                   className="max-w-full h-auto mx-auto bg-white rounded"
                   style={{ backgroundColor: "white" }}
@@ -1355,7 +1360,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                     <a
                       href={createEmailLink(commData.contactEmail)}
                       className="hover:underline cursor-pointer"
-                      // Added onClick handler for live preview email link
+                      // Added onClick handler to ensure email client opens
                       onClick={(e) => {
                         e.preventDefault()
                         const mailtoUrl = createEmailLink(commData.contactEmail)
@@ -1384,7 +1389,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
               <div className="bg-white rounded-lg p-3 inline-block mb-1 shadow-sm border border-gray-200">
                 <div className="bg-white p-1 rounded">
                   <img
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-CNyi24McGgxSB1Qcsr3TNXt5cIF98u.png"
+                    src="/images/image.png"
                     alt="Group Platform Engineering"
                     className="max-w-full h-8 mx-auto bg-white rounded"
                     style={{ backgroundColor: "white" }}
