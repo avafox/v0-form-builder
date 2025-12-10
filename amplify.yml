@@ -3,7 +3,8 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install --legacy-peer-deps
+        # Install dependencies with exact versions (security requirement)
+        - npm ci --legacy-peer-deps
     build:
       commands:
         - npm run build

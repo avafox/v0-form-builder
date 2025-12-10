@@ -1,0 +1,276 @@
+{
+  "info": {
+    "name": "GPE Communications Tool API",
+    "description": "API endpoints for testing the GPE Communications Tool",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_email",
+      "value": "user@yourcompany.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Access Control",
+      "item": [
+        {
+          "name": "Check Access - With Token (Delegated)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"accessToken\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/check-access",
+              "host": ["{{base_url}}"],
+              "path": ["api", "check-access"]
+            },
+            "description": "Check if user has access using their delegated access token. This uses the user's own permissions to read their group memberships."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Access - Without Token (Application)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{user_email}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/check-access",
+              "host": ["{{base_url}}"],
+              "path": ["api", "check-access"]
+            },
+            "description": "Check if user has access using application credentials. Falls back to app permissions if no user token provided."
+          },
+          "response": []
+        },
+        {
+          "name": "Check Access - Authorized User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"authorized-user@yourcompany.com\",\n  \"accessToken\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/check-access",
+              "host": ["{{base_url}}"],
+              "path": ["api", "check-access"]
+            },
+            "description": "Test with a user who IS in the GPE-Communications-Team group. Expected: hasAccess = true"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Access - Unauthorized User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"unauthorized-user@yourcompany.com\",\n  \"accessToken\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/check-access",
+              "host": ["{{base_url}}"],
+              "path": ["api", "check-access"]
+            },
+            "description": "Test with a user who IS NOT in the GPE-Communications-Team group. Expected: hasAccess = false"
+          },
+          "response": []
+        },
+        {
+          "name": "Check Access - Missing Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"accessToken\": \"{{access_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/check-access",
+              "host": ["{{base_url}}"],
+              "path": ["api", "check-access"]
+            },
+            "description": "Test error handling when email is missing. Expected: 400 error"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Email",
+      "item": [
+        {
+          "name": "Send Email - Basic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromEmail\": \"gpe-communications@yourcompany.com\",\n  \"to\": [\"test@yourcompany.com\"],\n  \"subject\": \"Test Email from Postman\",\n  \"htmlContent\": \"<h1>Test Email</h1><p>This is a test email sent from Postman.</p>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/send-email",
+              "host": ["{{base_url}}"],
+              "path": ["api", "send-email"]
+            },
+            "description": "Send a basic test email from the shared mailbox"
+          },
+          "response": []
+        },
+        {
+          "name": "Send Email - With CC and BCC",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fromEmail\": \"gpe-communications@yourcompany.com\",\n  \"to\": [\"recipient@yourcompany.com\"],\n  \"cc\": [\"cc-recipient@yourcompany.com\"],\n  \"bcc\": [\"bcc-recipient@yourcompany.com\"],\n  \"subject\": \"Test Email with CC and BCC\",\n  \"htmlContent\": \"<h1>Test Email</h1><p>This email includes CC and BCC recipients.</p>\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/send-email",
+              "host": ["{{base_url}}"],
+              "path": ["api", "send-email"]
+            },
+            "description": "Send email with CC and BCC recipients"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Get Access Token (Manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "https://graph.microsoft.com/.default",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://login.microsoftonline.com/{{tenant_id}}/oauth2/v2.0/token",
+              "protocol": "https",
+              "host": ["login", "microsoftonline", "com"],
+              "path": ["{{tenant_id}}", "oauth2", "v2.0", "token"]
+            },
+            "description": "Get an access token using client credentials flow (application permissions)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "API Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": ["{{base_url}}"],
+              "path": ["api", "health"]
+            },
+            "description": "Check if the API is running"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -225,6 +225,88 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
     }
   }
 
+  const sendViaAwsSes = async () => {
+    try {
+      console.log("[v0] Starting AWS SES email send...")
+
+      // Validate required fields
+      if (!emailSettings.recipients) {
+        alert("❌ Please enter at least one recipient email address")
+        return
+      }
+
+      if (!emailSettings.senderEmail) {
+        alert("❌ Please enter a sender email address")
+        return
+      }
+
+      // Generate the HTML email content
+      const htmlContent = generateEmailHTML()
+      const subject = emailSettings.customSubject || `${priorityTitles[commData.priority]}: ${commData.title}`
+
+      // Parse recipients (split by semicolon or comma)
+      const toEmails = emailSettings.recipients
+        .split(/[;,]/)
+        .map((email) => email.trim())
+        .filter((email) => email.length > 0)
+
+      const ccEmails = emailSettings.ccRecipients
+        ? emailSettings.ccRecipients
+            .split(/[;,]/)
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0)
+        : undefined
+
+      const bccEmails = emailSettings.bccRecipients
+        ? emailSettings.bccRecipients
+            .split(/[;,]/)
+            .map((email) => email.trim())
+            .filter((email) => email.length > 0)
+        : undefined
+
+      console.log("[v0] Sending email via AWS SES with:", {
+        from: emailSettings.senderEmail,
+        to: toEmails,
+        cc: ccEmails,
+        bcc: bccEmails,
+        subject,
+      })
+
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fromEmail: emailSettings.senderEmail,
+          to: toEmails,
+          subject: subject,
+          htmlContent: htmlContent,
+          cc: ccEmails,
+          bcc: bccEmails,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        console.log("[v0] Email sent successfully via AWS SES:", result)
+        alert(
+          `✅ Email sent successfully via AWS SES!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered.`,
+        )
+        setIsOutlookDialogOpen(false)
+      } else {
+        console.error("[v0] AWS SES email send failed:", result)
+        alert(
+          `❌ Failed to send email via AWS SES:\n\n${result.error || "Unknown error"}\n\nPlease check:\n1. AWS SES configuration is correct\n2. Sender email is verified in AWS SES\n3. API permissions are granted`,
+        )
+      }
+    } catch (error) {
+      console.error("[v0] Error sending via AWS SES:", error)
+      alert(`❌ Failed to send email via AWS SES: ${error.message}`)
+    }
+  }
+
   const generateCommunicationImage = async (): Promise<Blob> => {
     return new Promise((resolve, reject) => {
       try {
@@ -952,7 +1034,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Send via Azure</DialogTitle>
+                  <DialogTitle>Send via AWS SES</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -961,11 +1043,9 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       id="sender"
                       value={emailSettings.senderEmail}
                       onChange={(e) => updateEmailSetting("senderEmail", e.target.value)}
-                      placeholder="your-mailbox@yourcompany.com"
+                      placeholder="ava.foxwell@sky.uk"
                     />
-                    <p className="text-xs text-gray-600">
-                      Must be a valid email address in your Azure AD (user or shared mailbox)
-                    </p>
+                    <p className="text-xs text-gray-600">Must be a verified email address in AWS SES</p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="recipients">To (Recipients)</Label>
@@ -1005,12 +1085,12 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                     />
                   </div>
                   <div className="mt-2">
-                    <Button onClick={sendViaAzure} className="w-full bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={sendViaAwsSes} className="w-full bg-blue-600 hover:bg-blue-700">
                       <Send className="h-4 w-4 mr-2" />
-                      Send via Azure
+                      Send via AWS SES
                     </Button>
                     <p className="text-xs text-gray-600 mt-2">
-                      Sends email directly through Microsoft Graph API using your Azure app credentials
+                      Sends email directly through AWS SES using your verified email address
                     </p>
                   </div>
                 </div>

@@ -68,9 +68,9 @@ export function EmailSender({ htmlContent, subject }: EmailSenderProps) {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Mail className="h-5 w-5" />
-          Send via Microsoft Graph API
+          Send via AWS SES
         </CardTitle>
-        <CardDescription>Send this communication directly through your company's Outlook/Exchange</CardDescription>
+        <CardDescription>Send this communication using AWS Simple Email Service</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

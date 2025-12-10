@@ -1,19 +1,22 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { MicrosoftGraphService } from "@/lib/microsoft-graph"
+import { AWSSESEmailService } from "@/lib/aws-ses-email"
+
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
 
 export async function POST(request: NextRequest) {
   try {
     const { fromEmail, to, cc, subject, htmlContent } = await request.json()
 
-    // Initialize Microsoft Graph service with environment variables
-    const graphService = new MicrosoftGraphService({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+    const sesService = new AWSSESEmailService({
+      region: process.env.AWS_REGION || "eu-west-2",
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      fromEmail: process.env.AWS_SES_FROM_EMAIL!,
+      fromName: process.env.AWS_SES_FROM_NAME,
     })
 
-    // Send the email
-    await graphService.sendEmail(fromEmail, {
+    await sesService.sendEmail(fromEmail, {
       to,
       cc,
       subject,

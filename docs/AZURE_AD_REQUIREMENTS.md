@@ -21,32 +21,78 @@ This application requires minimal Azure AD permissions to:
 
 ## Required Permissions
 
-### 1. Email Sending (Application Permission)
+### Delegated Permissions (User Context)
 
-**Permission:** `Mail.Send.Shared`  
-**Type:** Application  
-**Justification:** Send emails from designated shared mailbox only  
-**Scope:** Limited to specific shared mailbox (configured below)
+**1. User.Read**
+- **Type:** Delegated
+- **Purpose:** Read signed-in user's profile (name, email)
+- **Scope:** User's own data only
+- **Required:** Yes
 
-**Alternative (if Mail.Send.Shared not available):**  
-**Permission:** `Mail.Send`  
-**Type:** Application  
-**Justification:** Send emails as application  
-**Mitigation:** Will be restricted to specific shared mailbox via "Send As" permissions
+**2. GroupMember.Read.All**
+- **Type:** Delegated
+- **Purpose:** Check if user belongs to authorized groups
+- **Scope:** User's own group memberships only
+- **Required:** Yes
+
+### Application Permissions (App Context)
+
+**NONE REQUIRED** ✅
+
+
+**Previously considered but NOT needed:**
+- ❌ Mail.Send - Company blocks this permission
+- ❌ Mail.Send.Shared - Company blocks this permission
+
+**Why no email permissions?**
+- App uses SMTP instead of Microsoft Graph API for email sending
+- SMTP bypasses the need for Graph API permissions
+- Only requires SMTP credentials (username/password)
 
 ---
 
-### 2. User Authentication (Delegated Permissions)
+## Email Sending Architecture
 
-**Permission:** `User.Read`  
-**Type:** Delegated  
-**Justification:** Read signed-in user's profile (name, email, ID)  
-**Scope:** User can only read their own profile
+### Method: SMTP (Not Graph API)
 
-**Permission:** `GroupMember.Read.All`  
-**Type:** Delegated  
-**Justification:** Check if signed-in user belongs to authorized groups  
-**Scope:** User can only read their own group memberships
+
+**Why SMTP?**
+1. Company blocks Mail.Send Graph API permission
+2. No Azure AD permissions needed for email sending
+3. Centralized control (only app has credentials)
+4. Users don't need mailbox access
+
+**Requirements:**
+- Shared mailbox SMTP credentials
+- SMTP enabled on mailbox (default for Office 365)
+- Environment variables configured
+
+**What Users DON'T Need:**
+- ❌ "Send As" permission on shared mailbox
+- ❌ Mail.Send delegated permission
+- ❌ Ability to send from mailbox in Outlook
+
+**Security Benefits:**
+- ✅ Only app can send emails
+- ✅ Users cannot manually send from mailbox
+- ✅ Full control over email content
+- ✅ Simpler permission management
+
+### Environment Variables Required
+
+\`\`\`bash
+# Email Method
+EMAIL_METHOD=smtp
+
+# SMTP Configuration
+SMTP_HOST=smtp.office365.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=gpe-communications@yourcompany.com
+SMTP_PASSWORD=your-mailbox-password
+SMTP_FROM_EMAIL=gpe-communications@yourcompany.com
+SMTP_FROM_NAME=GPE Communications Team
+\`\`\`
 
 ---
 
@@ -54,18 +100,33 @@ This application requires minimal Azure AD permissions to:
 
 **Shared Mailbox Email:** `gpe-communications@yourcompany.com` *(replace with actual)*
 
+
 **Required Setup:**
-1. Grant application service principal "Send As" permission on this mailbox only
-2. Do NOT grant access to any other mailboxes
-3. Restrict to this single shared mailbox
+1. ✅ Shared mailbox created in Microsoft 365
+2. ✅ SMTP enabled (default for Office 365)
+3. ✅ SMTP credentials (username/password) provided to application
+4. ❌ NO "Send As" permissions needed for app or users
+5. ❌ NO Graph API permissions needed
+
+**SMTP Credentials:**
+- Username: `gpe-communications@yourcompany.com`
+- Password: Shared mailbox password or app-specific password
 
 **PowerShell Command (for AD team):**
-```powershell
-# Grant Send As permission to specific shared mailbox only
-Add-RecipientPermission -Identity "gpe-communications@yourcompany.com" `
-  -Trustee "<Application-Service-Principal-Name>" `
-  -AccessRights SendAs -Confirm:$false
+\`\`\`powershell
+# No permissions needed for app or users
+\`\`\`
 
-# Verify permission
-Get-RecipientPermission -Identity "gpe-communications@yourcompany.com" | 
-  Where-Object {$_.Trustee -like "*<Application-Name>*"}
+---
+
+## What We Are NOT Requesting
+
+**Explicitly NOT requesting:**
+- ❌ `Mail.Send` (Application) - Company blocks this
+- ❌ `Mail.Send` (Delegated) - Would require users to have mailbox access
+- ❌ `Mail.Send.Shared` - Company blocks this
+- ❌ `Directory.Read.All` - Too broad, not needed
+- ❌ `User.Read.All` - Can read all users, not needed
+- ❌ "Send As" permissions for app service principal
+- ❌ "Send As" permissions for users on shared mailbox
+- ❌ Ability for users to send from mailbox in Outlook
