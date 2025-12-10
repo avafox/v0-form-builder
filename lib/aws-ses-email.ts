@@ -1,4 +1,4 @@
-import { SESClient, SendEmailCommand, GetAccountSendingEnabledCommand } from "@aws-sdk/client-ses"
+import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
 
 interface SESConfig {
   region: string
@@ -16,32 +16,31 @@ interface EmailData {
 }
 
 export class AWSSESEmailService {
-  private sesClient: SESClient
-  private fromEmail: string
-  private fromName?: string
+  private config: SESConfig
 
   constructor(config: SESConfig) {
-    this.sesClient = new SESClient({
-      region: config.region,
-      credentials: {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-      },
-      maxAttempts: 3,
-    })
-    this.fromEmail = config.fromEmail
-    this.fromName = config.fromName
+    this.config = config
   }
 
   async sendEmail(fromEmail: string, emailData: EmailData): Promise<boolean> {
     try {
       console.log("[v0] Preparing to send email via AWS SES")
-      console.log("[v0] Region:", process.env.SES_REGION)
-      console.log("[v0] From:", this.fromEmail)
+      console.log("[v0] Region:", this.config.region)
+      console.log("[v0] From:", this.config.fromEmail)
       console.log("[v0] To:", emailData.to)
+      console.log("[v0] Access Key ID (first 10 chars):", this.config.accessKeyId.substring(0, 10))
 
-      // Use the configured from email or the one passed in
-      const sourceEmail = this.fromName ? `${this.fromName} <${this.fromEmail}>` : this.fromEmail
+      const sesClient = new SESClient({
+        region: this.config.region,
+        credentials: {
+          accessKeyId: this.config.accessKeyId,
+          secretAccessKey: this.config.secretAccessKey,
+        },
+      })
+
+      const sourceEmail = this.config.fromName
+        ? `${this.config.fromName} <${this.config.fromEmail}>`
+        : this.config.fromEmail
 
       const command = new SendEmailCommand({
         Source: sourceEmail,
@@ -60,7 +59,6 @@ export class AWSSESEmailService {
               Charset: "UTF-8",
             },
             Text: {
-              // Strip HTML tags for plain text version
               Data: emailData.htmlContent.replace(/<[^>]*>/g, ""),
               Charset: "UTF-8",
             },
@@ -69,7 +67,7 @@ export class AWSSESEmailService {
       })
 
       console.log("[v0] Sending email command to AWS SES...")
-      const response = await this.sesClient.send(command)
+      const response = await sesClient.send(command)
       console.log("[v0] Email sent successfully via AWS SES:", response.MessageId)
       return true
     } catch (error) {
@@ -80,20 +78,6 @@ export class AWSSESEmailService {
         console.error("[v0] Error stack:", error.stack)
       }
       throw error
-    }
-  }
-
-  async verifyConnection(): Promise<boolean> {
-    try {
-      // AWS SES doesn't have a direct "verify" command, but we can check if we can access the service
-      // by attempting to get account sending statistics
-      const command = new GetAccountSendingEnabledCommand({})
-      await this.sesClient.send(command)
-      console.log("[v0] AWS SES connection verified")
-      return true
-    } catch (error) {
-      console.error("[v0] AWS SES connection failed:", error)
-      return false
     }
   }
 }
