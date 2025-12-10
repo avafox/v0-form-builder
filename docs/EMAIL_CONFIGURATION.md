@@ -81,7 +81,7 @@ MICROSOFT_CLIENT_SECRET=your-client-secret
 - Grant "Send As" permission to GPE-Communications-Team group
 
 **Setup:**
-\`\`\`powershell
+```powershell
 Add-RecipientPermission `
   -Identity "cti-cbp-gpe-communications@sky.uk" `
   -Trustee "GPE-Communications-Team" `

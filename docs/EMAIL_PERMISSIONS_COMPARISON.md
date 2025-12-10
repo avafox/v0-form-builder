@@ -86,7 +86,7 @@ User → Authenticates → Uses their token → Sends from shared mailbox
 
 ### Setup Commands
 
-\`\`\`powershell
+```powershell
 # Option A: Grant to entire group (recommended)
 Add-RecipientPermission -Identity "gpe-communications@yourcompany.com" `
   -Trustee "GPE-Communications-Team" `
