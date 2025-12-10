@@ -9,6 +9,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  experimental: {
+    serverComponentsExternalPackages: ['@aws-sdk/client-ses'],
+  },
 }
 
 export default nextConfig

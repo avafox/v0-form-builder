@@ -1,4 +1,4 @@
-import { SESClient, SendEmailCommand } from "@aws-sdk/client-ses"
+import { SESClient, SendEmailCommand, GetAccountSendingEnabledCommand } from "@aws-sdk/client-ses"
 
 interface SESConfig {
   region: string
@@ -27,10 +27,7 @@ export class AWSSESEmailService {
         accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey,
       },
-      // Disable credential provider chain that tries to read from filesystem
-      disableHostPrefix: false,
-      // Use fetch instead of node-http for compatibility
-      requestHandler: undefined, // Let SDK use default fetch-based handler
+      maxAttempts: 3,
     })
     this.fromEmail = config.fromEmail
     this.fromName = config.fromName
@@ -90,7 +87,6 @@ export class AWSSESEmailService {
     try {
       // AWS SES doesn't have a direct "verify" command, but we can check if we can access the service
       // by attempting to get account sending statistics
-      const { GetAccountSendingEnabledCommand } = await import("@aws-sdk/client-ses")
       const command = new GetAccountSendingEnabledCommand({})
       await this.sesClient.send(command)
       console.log("[v0] AWS SES connection verified")
