@@ -159,6 +159,10 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
 
       // Generate the HTML email content
       const htmlContent = generateEmailHTML()
+
+      console.log("[v0] Generated HTML email content (preview):", htmlContent.substring(0, 500))
+      console.log("[v0] HTML content length:", htmlContent.length, "characters")
+
       const subject = emailSettings.customSubject || `${priorityTitles[commData.priority]}: ${commData.title}`
 
       // Parse recipients (split by semicolon or comma)
