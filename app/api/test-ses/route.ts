@@ -6,8 +6,19 @@ export async function GET(request: NextRequest) {
   try {
     console.log("[v0] SES Diagnostic Tool Running")
 
+    const allEnvVars = Object.keys(process.env).filter(
+      (key) =>
+        key.includes("SES") ||
+        key.includes("MICROSOFT") ||
+        key.includes("NEXTAUTH") ||
+        key.includes("VERCEL") ||
+        key.includes("AWS"),
+    )
+
     const diagnostics = {
       timestamp: new Date().toISOString(),
+      runtime: "nodejs",
+      allRelevantEnvVars: allEnvVars,
       environmentVariables: {
         SES_REGION: process.env.SES_REGION || "MISSING",
         SES_ACCESS_KEY_ID: process.env.SES_ACCESS_KEY_ID
@@ -16,6 +27,8 @@ export async function GET(request: NextRequest) {
         SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY ? "***PRESENT***" : "MISSING",
         SES_FROM_EMAIL: process.env.SES_FROM_EMAIL || "MISSING",
         SES_FROM_NAME: process.env.SES_FROM_NAME || "MISSING",
+        NEXTAUTH_URL: process.env.NEXTAUTH_URL || "MISSING",
+        MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID ? "***PRESENT***" : "MISSING",
       },
       checks: [] as string[],
       errors: [] as string[],
