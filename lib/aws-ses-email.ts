@@ -54,15 +54,17 @@ export class AWSSESEmailService {
 
   async sendEmail(fromEmail: string, emailData: EmailData): Promise<boolean> {
     try {
-      console.log("[v0] Preparing to send email via AWS SES (fetch-based)")
+      console.log("[v0] === AWS SES Email Send Starting ===")
       console.log("[v0] Region:", this.config.region)
       console.log("[v0] From:", this.config.fromEmail)
       console.log("[v0] To:", emailData.to)
+      console.log("[v0] Subject:", emailData.subject)
       console.log("[v0] Access Key ID (first 8 chars):", this.config.accessKeyId.substring(0, 8))
 
       const service = "ses"
       const host = `email.${this.config.region}.amazonaws.com`
-      const endpoint = `https://${host}/`
+
+      const endpoint = `https://${host}/v2/email/outbound-emails`
       const method = "POST"
 
       // Create ISO8601 timestamp
@@ -70,7 +72,10 @@ export class AWSSESEmailService {
       const amzDate = now.toISOString().replace(/[:-]|\.\d{3}/g, "")
       const dateStamp = amzDate.substring(0, 8)
 
-      // Build the email body (SES API v2 format)
+      console.log("[v0] Timestamp:", amzDate)
+      console.log("[v0] Date stamp:", dateStamp)
+      console.log("[v0] Endpoint:", endpoint)
+
       const sourceEmail = this.config.fromName
         ? `${this.config.fromName} <${this.config.fromEmail}>`
         : this.config.fromEmail
@@ -87,26 +92,27 @@ export class AWSSESEmailService {
                 Data: emailData.htmlContent,
                 Charset: "UTF-8",
               },
-              Text: {
-                Data: emailData.htmlContent.replace(/<[^>]*>/g, ""),
-                Charset: "UTF-8",
-              },
             },
           },
         },
         Destination: {
           ToAddresses: emailData.to,
-          CcAddresses: emailData.cc || [],
+          ...(emailData.cc && emailData.cc.length > 0 ? { CcAddresses: emailData.cc } : {}),
         },
         FromEmailAddress: sourceEmail,
       })
 
+      console.log("[v0] Request body prepared, length:", requestBody.length)
+
       // Create canonical request
       const payloadHash = this.bufferToHex(await this.sha256(requestBody))
+      console.log("[v0] Payload hash:", payloadHash)
 
+      const canonicalUri = "/v2/email/outbound-emails"
+      const canonicalQueryString = ""
       const canonicalHeaders = `content-type:application/json\nhost:${host}\nx-amz-date:${amzDate}\n`
       const signedHeaders = "content-type;host;x-amz-date"
-      const canonicalRequest = `${method}\n/\n\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
+      const canonicalRequest = `${method}\n${canonicalUri}\n${canonicalQueryString}\n${canonicalHeaders}\n${signedHeaders}\n${payloadHash}`
 
       // Create string to sign
       const algorithm = "AWS4-HMAC-SHA256"
@@ -114,13 +120,18 @@ export class AWSSESEmailService {
       const canonicalRequestHash = this.bufferToHex(await this.sha256(canonicalRequest))
       const stringToSign = `${algorithm}\n${amzDate}\n${credentialScope}\n${canonicalRequestHash}`
 
+      console.log("[v0] Credential scope:", credentialScope)
+
       // Calculate signature
       const signingKey = await this.getSignatureKey(this.config.secretAccessKey, dateStamp, this.config.region, service)
       const signature = this.bufferToHex(await this.hmac(signingKey, stringToSign))
 
+      console.log("[v0] Signature calculated, length:", signature.length)
+
       // Build authorization header
       const authorizationHeader = `${algorithm} Credential=${this.config.accessKeyId}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`
 
+      console.log("[v0] Authorization header prepared")
       console.log("[v0] Sending request to SES API v2...")
 
       // Make the request
@@ -135,34 +146,42 @@ export class AWSSESEmailService {
         body: requestBody,
       })
 
+      console.log("[v0] Response received, status:", response.status, response.statusText)
+
       if (!response.ok) {
         const errorText = await response.text()
-        console.error("[v0] SES API error status:", response.status)
-        console.error("[v0] SES API error statusText:", response.statusText)
-        console.error("[v0] SES API error response:", errorText)
-        console.error("[v0] Request endpoint:", endpoint)
-        console.error("[v0] Request region:", this.config.region)
+        console.error("[v0] === SES API ERROR ===")
+        console.error("[v0] Status:", response.status)
+        console.error("[v0] Status Text:", response.statusText)
+        console.error("[v0] Response:", errorText)
+        console.error("[v0] Endpoint:", endpoint)
+        console.error("[v0] Region:", this.config.region)
 
-        // Try to parse AWS error details if available
+        // Try to parse AWS error details
         try {
           const errorJson = JSON.parse(errorText)
-          console.error("[v0] AWS Error Code:", errorJson.__type || errorJson.code)
-          console.error("[v0] AWS Error Message:", errorJson.message)
-        } catch (e) {
-          // Error response wasn't JSON
-        }
+          console.error("[v0] AWS Error Type:", errorJson.__type || errorJson.Type)
+          console.error("[v0] AWS Error Code:", errorJson.Code)
+          console.error("[v0] AWS Error Message:", errorJson.Message || errorJson.message)
 
-        throw new Error(`SES API error: ${response.status} ${response.statusText} - ${errorText}`)
+          throw new Error(`SES API Error: ${errorJson.Message || errorJson.message || errorText}`)
+        } catch (parseError) {
+          // Error response wasn't JSON
+          throw new Error(`SES API Error (${response.status}): ${errorText}`)
+        }
       }
 
       const result = await response.json()
-      console.log("[v0] Email sent successfully via AWS SES:", result)
+      console.log("[v0] === Email Sent Successfully ===")
+      console.log("[v0] Result:", JSON.stringify(result))
       return true
     } catch (error) {
-      console.error("[v0] Failed to send email via AWS SES:", error)
+      console.error("[v0] === SES Email Send Failed ===")
+      console.error("[v0] Error:", error)
       if (error instanceof Error) {
         console.error("[v0] Error name:", error.name)
         console.error("[v0] Error message:", error.message)
+        console.error("[v0] Error stack:", error.stack)
       }
       throw error
     }
