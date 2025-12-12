@@ -58,6 +58,7 @@ export class AWSSESEmailService {
       console.log("[v0] Region:", this.config.region)
       console.log("[v0] From:", this.config.fromEmail)
       console.log("[v0] To:", emailData.to)
+      console.log("[v0] Access Key ID (first 8 chars):", this.config.accessKeyId.substring(0, 8))
 
       const service = "ses"
       const host = `email.${this.config.region}.amazonaws.com`
@@ -136,7 +137,21 @@ export class AWSSESEmailService {
 
       if (!response.ok) {
         const errorText = await response.text()
+        console.error("[v0] SES API error status:", response.status)
+        console.error("[v0] SES API error statusText:", response.statusText)
         console.error("[v0] SES API error response:", errorText)
+        console.error("[v0] Request endpoint:", endpoint)
+        console.error("[v0] Request region:", this.config.region)
+
+        // Try to parse AWS error details if available
+        try {
+          const errorJson = JSON.parse(errorText)
+          console.error("[v0] AWS Error Code:", errorJson.__type || errorJson.code)
+          console.error("[v0] AWS Error Message:", errorJson.message)
+        } catch (e) {
+          // Error response wasn't JSON
+        }
+
         throw new Error(`SES API error: ${response.status} ${response.statusText} - ${errorText}`)
       }
 

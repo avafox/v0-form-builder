@@ -14,6 +14,9 @@ export async function POST(request: NextRequest) {
     console.log("[v0] Environment check - SES_ACCESS_KEY_ID exists:", !!process.env.SES_ACCESS_KEY_ID)
     console.log("[v0] Environment check - SES_SECRET_ACCESS_KEY exists:", !!process.env.SES_SECRET_ACCESS_KEY)
     console.log("[v0] Environment check - SES_FROM_EMAIL:", process.env.SES_FROM_EMAIL)
+    if (process.env.SES_ACCESS_KEY_ID) {
+      console.log("[v0] SES_ACCESS_KEY_ID (first 8 chars):", process.env.SES_ACCESS_KEY_ID.substring(0, 8))
+    }
 
     if (!process.env.SES_ACCESS_KEY_ID || !process.env.SES_SECRET_ACCESS_KEY) {
       throw new Error(
@@ -45,6 +48,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("[v0] Email sending failed:", error)
+    if (error instanceof Error) {
+      console.error("[v0] Error name:", error.name)
+      console.error("[v0] Error message:", error.message)
+      console.error("[v0] Error stack:", error.stack)
+    }
     return NextResponse.json(
       {
         error: "Failed to send email",

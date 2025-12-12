@@ -1,93 +1,58 @@
 # GPE Communications Tool
 
-Internal communications management tool for the GPE team, built with Next.js and AWS SES.
+Internal communications management tool for the GPE team at Sky UK, built with Next.js and AWS SES.
 
 ## Overview
 
-This app allows the GPE team to create, manage, and send professional email communications using AWS Simple Email Service (SES). It features Azure AD authentication for secure access control and a rich text editor for composing emails.
+This app allows the GPE team to create, manage, and send professional email communications using AWS Simple Email Service (SES). It features Azure AD authentication for secure Sky UK SSO access and a rich text editor for composing emails.
 
 ## Features
 
 - 📧 Email composition and sending via AWS SES
 - 🎨 Rich text editor with formatting options
-- 👥 Azure AD authentication and group-based access control
+- 👥 Azure AD authentication (Sky UK SSO)
 - 📱 Responsive design for desktop and mobile
 - 🔒 Secure email delivery with AWS infrastructure
-- 📊 Email history and tracking
+- ⚡ Server-side rendering with Next.js 15
 
 ## Tech Stack
 
 - **Framework:** Next.js 15 with App Router
-- **Authentication:** Azure AD (Microsoft Entra ID)
-- **Email Service:** AWS SES (Simple Email Service)
-- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Azure AD (Microsoft Entra ID) via NextAuth
+- **Email Service:** AWS SES (Custom fetch implementation)
+- **Database:** Supabase (PostgreSQL with RLS)
 - **Cache:** Upstash Redis
-- **Styling:** Tailwind CSS
-- **Deployment:** AWS Amplify
+- **Styling:** Tailwind CSS v4 + shadcn/ui
+- **Hosting:** AWS Amplify (SSR enabled, Node.js 20)
 
-## Environment Variables
+## Quick Start
 
-Required environment variables:
+### Prerequisites
 
-\`\`\`bash
-# AWS SES (Email Sending)
-AWS_REGION=eu-west-2
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_SES_FROM_EMAIL=ava.foxwell@sky.uk
-AWS_SES_FROM_NAME=GPE Communications Team
+- Node.js 20 or higher
+- AWS Account with SES configured
+- Azure AD app registration
+- Supabase project
 
-# Azure AD (Authentication Only)
-MICROSOFT_CLIENT_ID=your-client-id
-MICROSOFT_TENANT_ID=your-tenant-id
-MICROSOFT_CLIENT_SECRET=your-client-secret
-
-# Database (Supabase)
-POSTGRES_URL=your-postgres-url
-SUPABASE_URL=your-supabase-url
-SUPABASE_ANON_KEY=your-anon-key
-
-# Cache (Upstash Redis)
-KV_URL=your-kv-url
-KV_REST_API_TOKEN=your-token
-\`\`\`
-
-## Setup
-
-### 1. AWS SES Configuration
-
-See [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for detailed setup instructions.
-
-Quick steps:
-1. Verify email address `ava.foxwell@sky.uk` in AWS SES
-2. Create IAM user with SES permissions
-3. Add AWS credentials to environment variables
-4. Request production access (to send to any email)
-
-### 2. Azure AD Configuration
-
-Azure AD is used **only for authentication** (not for email sending).
-
-Required permissions:
-- User.Read (Delegated) - Read user profile
-- GroupMember.Read.All (Delegated) - Check group membership
-
-Setup:
-1. Register app in Azure AD
-2. Configure redirect URIs
-3. Add required permissions above
-4. Grant admin consent
-5. Create client secret
-
-**Note:** No Mail.Send permission needed - emails are sent via AWS SES.
-
-### 3. Install Dependencies
+### 1. Clone and Install
 
 \`\`\`bash
+git clone <your-repo-url>
+cd form-builder
 npm install
 \`\`\`
 
-### 4. Run Development Server
+### 2. Configure Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+\`\`\`bash
+cp .env.example .env.local
+\`\`\`
+
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed variable descriptions.
+
+### 3. Run Development Server
 
 \`\`\`bash
 npm run dev
@@ -95,68 +60,183 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
-## Testing
+## Environment Variables
 
-Test AWS SES connection:
+**Critical variables for AWS Amplify:**
 
 \`\`\`bash
-npx tsx scripts/test-aws-ses.tsx
+# Authentication (Azure AD + NextAuth)
+MICROSOFT_CLIENT_ID=<azure-client-id>
+MICROSOFT_CLIENT_SECRET=<azure-client-secret>
+MICROSOFT_TENANT_ID=<azure-tenant-id>
+NEXTAUTH_SECRET=<generate-with-openssl>
+NEXTAUTH_URL=https://your-app.amplifyapp.com
+
+# Email (AWS SES)
+# Important: Use SES_ prefix (Amplify reserves AWS_ prefix)
+SES_ACCESS_KEY_ID=<iam-access-key>
+SES_SECRET_ACCESS_KEY=<iam-secret-key>
+SES_REGION=eu-west-2
+SES_FROM_EMAIL=cti-gpe-communications@sky.uk
+SES_FROM_NAME=GPE Communications Team
+
+# Database (Supabase)
+NEXT_PUBLIC_SUPABASE_URL=<supabase-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
+
+# Cache (Upstash Redis)
+KV_URL=<upstash-url>
+KV_REST_API_TOKEN=<upstash-token>
+KV_REST_API_URL=<upstash-rest-url>
 \`\`\`
 
-## Deployment
+## Documentation
 
-The app is configured for AWS Amplify deployment:
+Comprehensive documentation is available in the `/docs` folder:
 
-1. Connect your GitHub repository to Amplify
-2. Configure environment variables in Amplify console
-3. Deploy automatically on push to main branch
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and design decisions
+- **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Deployment guide and troubleshooting
+- **[DEVELOPMENT.md](./docs/DEVELOPMENT.md)** - Local development setup and guidelines
+- **[COMMON-ISSUES.md](./docs/COMMON-ISSUES.md)** - Common problems and solutions
 
 ## Architecture
 
-- **Authentication:** Azure AD handles user authentication and group membership checking
-- **Email Sending:** AWS SES sends all emails (independent of Microsoft 365)
-- **Database:** Supabase stores email templates and history
-- **Cache:** Upstash Redis caches user sessions and group memberships
-
-## Email Flow
-
+### Authentication Flow
 \`\`\`
-User creates email → App validates → AWS SES sends → Recipient receives
-                          ↓
-                   Azure AD checks user access
+User → Azure AD Login → NextAuth → Protected Routes → App
 \`\`\`
 
-**Key Points:**
-- No Microsoft Graph API needed for email
-- No mailbox "Send As" permissions needed
-- Azure AD only used for authentication
-- All emails sent through AWS SES
+### Email Sending Flow
+\`\`\`
+User → Form Submit → /api/send-email (Node.js) → AWS SES → Recipient
+\`\`\`
+
+**Key Design Decisions:**
+
+1. **Custom SES Implementation:** AWS SDK v3 doesn't work in Amplify's SSR environment due to Node.js filesystem dependencies. We use a custom fetch-based implementation with AWS Signature V4 signing.
+
+2. **Azure AD for Auth Only:** Azure AD handles authentication (Sky UK SSO), but AWS SES handles all email sending. No Microsoft Graph API needed.
+
+3. **Environment Variable Naming:** Amplify reserves the `AWS_` prefix, so we use `SES_` prefix for all SES-related variables.
+
+## Deployment
+
+### AWS Amplify (Production)
+
+The app auto-deploys when you push to the `main` branch:
+
+\`\`\`bash
+git push origin main
+\`\`\`
+
+Monitor deployment:
+\`\`\`
+AWS Amplify Console → Deployments → View logs
+\`\`\`
+
+**Important:** After changing environment variables in Amplify Console, manually redeploy:
+\`\`\`
+Amplify Console → Actions → Redeploy this version
+\`\`\`
+
+### Manual Deployment Steps
+
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for complete deployment instructions.
+
+## Testing
+
+### Test Email Sending
+
+1. Ensure both sender and recipient emails are verified in AWS SES
+2. Fill out the email form
+3. Click "Send via AWS SES"
+4. Check browser console for `[v0]` debug logs
+
+### Debug Mode
+
+The app includes console logging for debugging. Look for:
+\`\`\`javascript
+console.log('[v0] Environment variables loaded:', { ... })
+console.log('[v0] Sending email to AWS SES...')
+\`\`\`
+
+## Common Issues
+
+### Email Not Sending
+
+**Check:**
+1. Environment variables configured in Amplify Console
+2. Sender email `cti-gpe-communications@sky.uk` verified in AWS SES
+3. If SES is in sandbox mode, recipient must also be verified
+4. IAM user has `AmazonSESFullAccess` policy
+
+See [docs/COMMON-ISSUES.md](./docs/COMMON-ISSUES.md) for detailed troubleshooting.
+
+### 403 CloudFront Error
+
+**Solutions:**
+1. Verify environment variables are set in Amplify Console
+2. Redeploy: `Actions → Redeploy this version`
+3. Clear CloudFront cache: `Actions → Invalidate cache`
+4. Check build logs for errors
+
+### Login Issues
+
+**Check:**
+1. Azure AD redirect URI matches Amplify URL
+2. `NEXTAUTH_SECRET` and `NEXTAUTH_URL` are set
+3. User has @sky.uk email address
+
+## Maintenance
+
+### Long-Term Maintenance Strategy
+
+1. **Documentation:** Keep `/docs` folder updated with changes
+2. **Changelog:** Update `CHANGELOG.md` with each release
+3. **Dependencies:** Review and update packages quarterly
+4. **Security:** Rotate `NEXTAUTH_SECRET` annually
+5. **Monitoring:** Check Amplify logs weekly for errors
+
+### Regular Tasks
+
+- **Weekly:** Review Amplify deployment logs
+- **Monthly:** Check AWS SES sending statistics
+- **Quarterly:** Update npm dependencies
+- **Annually:** Rotate secrets and review IAM permissions
+
+See [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) for code standards and contribution guidelines.
 
 ## Security
 
-- Azure AD group-based access control
-- Environment variables for sensitive credentials
-- AWS IAM for SES permissions
-- HTTPS only in production
-- No email credentials stored in app
+- **Authentication:** Azure AD with Sky UK SSO
+- **Authorization:** Group-based access control
+- **Database:** Row Level Security (RLS) enabled on all tables
+- **Secrets:** Environment variables managed in Amplify Console
+- **Email:** AWS SES with least-privilege IAM policy
+- **Sessions:** Encrypted with NextAuth secret
 
-## Cost
+## Cost Estimate
 
-**AWS SES:** ~$0.10 per 1,000 emails
-- Very cost-effective for internal communications
-- See [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for detailed pricing
+- **AWS SES:** ~$0.10 per 1,000 emails
+- **AWS Amplify:** ~$5-15/month for hosting
+- **Supabase:** Free tier or ~$25/month for Pro
+- **Upstash Redis:** Free tier or ~$10/month
+
+**Total:** ~$40-50/month for production workload
 
 ## Support
 
 For issues or questions:
-1. Check [docs/AWS_SES_SETUP.md](./docs/AWS_SES_SETUP.md) for troubleshooting
-2. Contact the development team
+1. Check [docs/COMMON-ISSUES.md](./docs/COMMON-ISSUES.md)
+2. Review Amplify deployment logs
+3. Contact development team
 
-## Deployment Status
+## Project Links
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/avafoxwell-4565s-projects/v0-form-builder)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/projects/tflzi32BBKO)
+**Amplify URL:** https://main.d2baofxalff7ki.amplifyapp.com
+**v0 Project:** Continue building at [v0.app](https://v0.app/chat/projects/tflzi32BBKO)
 
-**Live at:** [https://vercel.com/avafoxwell-4565s-projects/v0-form-builder](https://vercel.com/avafoxwell-4565s-projects/v0-form-builder)
+## License
 
-**Continue building:** [https://v0.app/chat/projects/tflzi32BBKO](https://v0.app/chat/projects/tflzi32BBKO)
+Internal Sky UK project - All rights reserved
