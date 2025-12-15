@@ -10,6 +10,8 @@ export async function POST(request: NextRequest) {
     const { fromEmail, to, cc, subject, htmlContent } = await request.json()
 
     console.log("[v0] Email details:", { fromEmail, to: to?.length, subject })
+    console.log("[v0] HTML content received - Length:", htmlContent?.length || 0)
+    console.log("[v0] HTML content preview (first 500 chars):", htmlContent?.substring(0, 500))
     console.log("[v0] Environment check - SES_REGION:", process.env.SES_REGION)
     console.log("[v0] Environment check - SES_ACCESS_KEY_ID exists:", !!process.env.SES_ACCESS_KEY_ID)
     console.log("[v0] Environment check - SES_SECRET_ACCESS_KEY exists:", !!process.env.SES_SECRET_ACCESS_KEY)
