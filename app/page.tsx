@@ -4,10 +4,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Sparkles, Zap, FileCheck } from "lucide-react"
-import { useSession } from "next-auth/react"
 
 export default function HomePage() {
-  const { data: session } = useSession()
+  // const { data: session } = useSession()
 
   return (
     <div className="min-h-screen bg-white">
@@ -25,21 +24,12 @@ export default function HomePage() {
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
             Create professional, branded email communications in minutes
           </p>
-          {session ? (
-            <Link href="/communications">
-              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6 h-auto">
-                Start Creating
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/auth/signin">
-              <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6 h-auto">
-                Sign In to Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          )}
+          <Link href="/communications">
+            <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6 h-auto">
+              Start Creating
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -100,27 +90,15 @@ export default function HomePage() {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Create your first communication now and see how easy it is
           </p>
-          {session ? (
-            <Link href="/communications">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 text-white hover:opacity-90 text-lg px-8 py-6 h-auto"
-              >
-                Launch Communications Builder
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          ) : (
-            <Link href="/auth/signin">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 text-white hover:opacity-90 text-lg px-8 py-6 h-auto"
-              >
-                Sign In to Continue
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-          )}
+          <Link href="/communications">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 text-white hover:opacity-90 text-lg px-8 py-6 h-auto"
+            >
+              Launch Communications Builder
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
