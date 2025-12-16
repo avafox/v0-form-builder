@@ -210,39 +210,39 @@ This document compares the two email sending methods available in the GPE Commun
 **Steps:**
 
 1. **Get SMTP credentials**
-   \`\`\`
+   ```
    - Create app password for shared mailbox
    - Or create service account with "Send As" permission
-   \`\`\`
+   ```
 
 2. **Add environment variables**
-   \`\`\`bash
+   ```bash
    EMAIL_METHOD=smtp
    SMTP_HOST=smtp.office365.com
    SMTP_PORT=587
    SMTP_SECURE=false
    SMTP_USER=gpe-communications@yourcompany.com
    SMTP_PASSWORD=your-app-password
-   \`\`\`
+   ```
 
 3. **Test SMTP connection**
-   \`\`\`bash
+   ```bash
    npx tsx scripts/test-smtp.ts
-   \`\`\`
+   ```
 
 4. **Deploy changes**
-   \`\`\`
+   ```
    - Update AWS Amplify environment variables
    - Redeploy application
    - Test email sending
-   \`\`\`
+   ```
 
 5. **Remove Graph permissions (optional)**
-   \`\`\`
+   ```
    - Azure Portal → App registrations
    - Remove Mail.Send permission
    - Keep User.Read and GroupMember.Read.All
-   \`\`\`
+   ```
 
 ---
 
@@ -256,42 +256,42 @@ This document compares the two email sending methods available in the GPE Commun
 **Steps:**
 
 1. **Configure Azure AD app**
-   \`\`\`
+   ```
    - Add Mail.Send (Application) permission
    - Grant admin consent
    - Wait 15-30 minutes for propagation
-   \`\`\`
+   ```
 
 2. **Grant "Send As" permission**
    ```powershell
    Add-RecipientPermission -Identity "shared-mailbox@company.com" `
      -Trustee "Your App Name" -AccessRights SendAs
-   \`\`\`
+   ```
 
 3. **Update environment variables**
-   \`\`\`bash
+   ```bash
    EMAIL_METHOD=graph
    # SMTP variables can be removed
-   \`\`\`
+   ```
 
 4. **Test Graph API**
-   \`\`\`bash
+   ```bash
    # Use Postman collection or curl
    curl -X POST /api/send-email ...
-   \`\`\`
+   ```
 
 5. **Deploy changes**
-   \`\`\`
+   ```
    - Update AWS Amplify environment variables
    - Redeploy application
    - Test email sending
-   \`\`\`
+   ```
 
 ---
 
 ## Troubleshooting Decision Tree
 
-\`\`\`
+```
 Email not sending?
 │
 ├─ Using SMTP?
@@ -324,7 +324,7 @@ Email not sending?
       ├─ Verify client secret is correct
       ├─ Check client secret not expired
       └─ Ensure tenant ID is correct
-\`\`\`
+```
 
 ---
 

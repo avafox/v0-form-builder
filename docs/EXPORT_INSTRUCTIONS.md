@@ -17,7 +17,7 @@ This guide explains how to export the architecture documentation to various form
 
 ### Method A: Using Pandoc (Recommended)
 
-\`\`\`bash
+```bash
 # Install pandoc
 # macOS
 brew install pandoc
@@ -35,7 +35,7 @@ pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
   -V geometry:margin=1in \
   --toc \
   --toc-depth=2
-\`\`\`
+```
 
 ### Method B: Using VS Code Extension
 
@@ -58,7 +58,7 @@ pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
 
 ### Method A: Using Mermaid CLI
 
-\`\`\`bash
+```bash
 # Install mermaid-cli
 npm install -g @mermaid-js/mermaid-cli
 
@@ -75,7 +75,7 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
 mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   -o diagrams/ \
   -e svg
-\`\`\`
+```
 
 ### Method B: Using Mermaid Live Editor
 
@@ -98,14 +98,14 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
 
 ### Method A: Convert Mermaid to Visio
 
-\`\`\`bash
+```bash
 # Install mermaid-to-visio converter
 npm install -g mermaid-to-visio
 
 # Convert diagrams
 mermaid-to-visio docs/AWS_ARCHITECTURE_DETAILED.md \
   -o AWS_Architecture.vsdx
-\`\`\`
+```
 
 ### Method B: Manual Recreation
 
@@ -137,7 +137,7 @@ mermaid-to-visio docs/AWS_ARCHITECTURE_DETAILED.md \
 
 ### Method B: Using Draw.io Desktop
 
-\`\`\`bash
+```bash
 # Install draw.io desktop
 # macOS
 brew install --cask drawio
@@ -147,7 +147,7 @@ sudo snap install drawio
 
 # Open and import
 drawio docs/AWS_ARCHITECTURE_DETAILED.md
-\`\`\`
+```
 
 ---
 
@@ -155,7 +155,7 @@ drawio docs/AWS_ARCHITECTURE_DETAILED.md
 
 ### Method A: Export Diagrams as Images
 
-\`\`\`bash
+```bash
 # Export all diagrams as PNG
 mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   -o diagrams/ \
@@ -164,16 +164,16 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   -H 1080
 
 # Then insert into PowerPoint
-\`\`\`
+```
 
 ### Method B: Using Pandoc
 
-\`\`\`bash
+```bash
 # Convert to PowerPoint
 pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
   -o AWS_Architecture.pptx \
   -t pptx
-\`\`\`
+```
 
 ### Method C: Manual Creation
 
@@ -195,7 +195,7 @@ pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
 
 ### Method B: Convert to Confluence Storage Format
 
-\`\`\`bash
+```bash
 # Install markdown-to-confluence
 npm install -g markdown-to-confluence
 
@@ -203,7 +203,7 @@ npm install -g markdown-to-confluence
 markdown-to-confluence \
   docs/AWS_ARCHITECTURE_DETAILED.md \
   -o confluence.xml
-\`\`\`
+```
 
 ### Method C: Use Mermaid Plugin
 
@@ -218,7 +218,7 @@ markdown-to-confluence \
 
 ### Extract Cost Table
 
-\`\`\`bash
+```bash
 # Install pandoc with lua filter
 pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
   -t csv \
@@ -227,7 +227,7 @@ pandoc docs/AWS_ARCHITECTURE_DETAILED.md \
 
 # Open in Excel
 open AWS_Costs.csv
-\`\`\`
+```
 
 ### Manual Export
 
@@ -242,7 +242,7 @@ open AWS_Costs.csv
 
 ### High-Resolution Export
 
-\`\`\`bash
+```bash
 # Export main diagram as high-res PNG
 mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   -o architecture-poster.png \
@@ -251,7 +251,7 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   -b white
 
 # Print at 24" x 36" for office display
-\`\`\`
+```
 
 ---
 
@@ -259,7 +259,7 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
 
 ### Method A: Using Mermaid.js
 
-\`\`\`html
+```html
 <!DOCTYPE html>
 <html>
 <head>
@@ -272,11 +272,11 @@ mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md \
   </div>
 </body>
 </html>
-\`\`\`
+```
 
 ### Method B: Using Markdown to HTML
 
-\`\`\`bash
+```bash
 # Install markdown-it
 npm install -g markdown-it
 
@@ -286,7 +286,7 @@ markdown-it docs/AWS_ARCHITECTURE_DETAILED.md \
 
 # Open in browser
 open AWS_Architecture.html
-\`\`\`
+```
 
 ---
 
@@ -294,7 +294,7 @@ open AWS_Architecture.html
 
 Create a script to export all formats at once:
 
-\`\`\`bash
+```bash
 #!/bin/bash
 # export-all.sh
 
@@ -334,14 +334,14 @@ markdown-it docs/AWS_ARCHITECTURE_DETAILED.md \
   -o exports/AWS_Architecture.html
 
 echo "Export complete! Files saved to exports/"
-\`\`\`
+```
 
 Make executable and run:
 
-\`\`\`bash
+```bash
 chmod +x export-all.sh
 ./export-all.sh
-\`\`\`
+```
 
 ---
 
@@ -359,26 +359,26 @@ chmod +x export-all.sh
 
 ### Mermaid CLI Issues
 
-\`\`\`bash
+```bash
 # If mmdc command not found
 npm install -g @mermaid-js/mermaid-cli
 
 # If puppeteer fails
 npm install -g puppeteer --unsafe-perm=true
-\`\`\`
+```
 
 ### Pandoc Issues
 
-\`\`\`bash
+```bash
 # If PDF generation fails
 # Install LaTeX
 brew install basictex  # macOS
 sudo apt-get install texlive  # Ubuntu
-\`\`\`
+```
 
 ### Font Issues in Exports
 
-\`\`\`bash
+```bash
 # Install required fonts
 # macOS
 brew tap homebrew/cask-fonts
@@ -386,7 +386,7 @@ brew install font-dejavu
 
 # Ubuntu
 sudo apt-get install fonts-dejavu
-\`\`\`
+```
 
 ---
 

@@ -3,20 +3,20 @@
 ## Local Development Setup
 
 ### 1. Clone Repository
-\`\`\`bash
+```bash
 git clone <your-repo-url>
 cd form-builder
-\`\`\`
+```
 
 ### 2. Install Dependencies
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 ### 3. Environment Variables
 
 Create `.env.local`:
-\`\`\`env
+```env
 # Authentication
 MICROSOFT_CLIENT_ID=<from Azure AD>
 MICROSOFT_CLIENT_SECRET=<from Azure AD>
@@ -40,21 +40,21 @@ SUPABASE_SERVICE_ROLE_KEY=<from dashboard>
 KV_URL=<from Upstash>
 KV_REST_API_TOKEN=<from Upstash>
 KV_REST_API_URL=<from Upstash>
-\`\`\`
+```
 
 **Important:** Never commit `.env.local` to Git!
 
 ### 4. Configure Azure AD for Localhost
 
 Add redirect URI in Azure Portal:
-\`\`\`
+```
 http://localhost:3000/api/auth/callback/azure-ad
-\`\`\`
+```
 
 ### 5. Run Development Server
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 Open http://localhost:3000
 
@@ -85,52 +85,52 @@ Open http://localhost:3000
 ## Common Tasks
 
 ### Adding a New Component
-\`\`\`bash
+```bash
 # If shadcn component
 npx shadcn@latest add <component-name>
 
 # Custom component
 touch components/my-component.tsx
-\`\`\`
+```
 
 ### Database Migrations
-\`\`\`bash
+```bash
 # Create new migration
 touch scripts/migration-v2-add-field.sql
 
 # Run in Amplify (auto-executes in /scripts folder)
-\`\`\`
+```
 
 ### Testing Email Locally
-\`\`\`bash
+```bash
 # Start dev server
 npm run dev
 
 # Email will send to real SES (use test recipients verified in SES)
-\`\`\`
+```
 
 ### Debugging
-\`\`\`typescript
+```typescript
 // Add debug logs
 console.log('[v0] Variable value:', myVar)
 
 // Check in browser console (F12)
 // Remove before committing
-\`\`\`
+```
 
 ## Git Workflow
 
 ### Branch Strategy
-\`\`\`
+```
 main - Production (auto-deploys to Amplify)
-\`\`\`
+```
 
 ### Commit Messages
-\`\`\`bash
+```bash
 git commit -m "feat: add new form field"
 git commit -m "fix: email sending error"
 git commit -m "docs: update deployment guide"
-\`\`\`
+```
 
 ### Before Pushing
 1. Test locally: `npm run dev`
@@ -141,13 +141,13 @@ git commit -m "docs: update deployment guide"
 ## Package Management
 
 ### Adding Dependencies
-\`\`\`bash
+```bash
 npm install <package-name>
 # Push updated package.json and package-lock.json
-\`\`\`
+```
 
 ### Updating Dependencies
-\`\`\`bash
+```bash
 # Check outdated
 npm outdated
 
@@ -156,26 +156,26 @@ npm update <package-name>
 
 # Update all (careful!)
 npm update
-\`\`\`
+```
 
 **Important:** Always test after updating packages
 
 ## Troubleshooting
 
 ### Port Already in Use
-\`\`\`bash
+```bash
 # Kill process on port 3000
 lsof -ti:3000 | xargs kill -9
-\`\`\`
+```
 
 ### Build Errors
-\`\`\`bash
+```bash
 # Clear Next.js cache
 rm -rf .next
 npm run dev
-\`\`\`
+```
 
 ### Type Errors
-\`\`\`bash
+```bash
 # Restart TypeScript server in VS Code
 Cmd/Ctrl + Shift + P → "TypeScript: Restart TS Server"

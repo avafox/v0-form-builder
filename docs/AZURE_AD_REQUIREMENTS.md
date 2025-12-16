@@ -80,7 +80,7 @@ This application requires minimal Azure AD permissions to:
 
 ### Environment Variables Required
 
-\`\`\`bash
+```bash
 # Email Method
 EMAIL_METHOD=smtp
 
@@ -92,7 +92,7 @@ SMTP_USER=gpe-communications@yourcompany.com
 SMTP_PASSWORD=your-mailbox-password
 SMTP_FROM_EMAIL=gpe-communications@yourcompany.com
 SMTP_FROM_NAME=GPE Communications Team
-\`\`\`
+```
 
 ---
 
@@ -113,9 +113,9 @@ SMTP_FROM_NAME=GPE Communications Team
 - Password: Shared mailbox password or app-specific password
 
 **PowerShell Command (for AD team):**
-\`\`\`powershell
+```powershell
 # No permissions needed for app or users
-\`\`\`
+```
 
 ---
 

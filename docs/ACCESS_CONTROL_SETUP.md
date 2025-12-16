@@ -53,7 +53,7 @@
 
 ### Test Delegated Permissions
 
-\`\`\`bash
+```bash
 # The access token is now the user's own token
 # Test by signing in as different users
 
@@ -62,12 +62,12 @@ curl http://localhost:3000/api/check-access \
   -H "Cookie: next-auth.session-token=..."
 
 # Expected: { "hasAccess": true, "groups": [...] }
-\`\`\`
+```
 
 ### Verify Token Scopes
 
-\`\`\`typescript
+```typescript
 // In your API route, log the token to verify scopes
 const session = await getServerSession(authOptions)
 console.log("[v0] Token scopes:", session.accessToken)
-\`\`\`
+```

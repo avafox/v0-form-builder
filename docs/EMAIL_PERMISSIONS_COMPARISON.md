@@ -10,9 +10,9 @@ This document compares three approaches for sending emails from the GPE Communic
 
 ### Configuration
 
-\`\`\`
+```
 Azure AD App → Has Mail.Send permission → Sends from shared mailbox
-\`\`\`
+```
 
 ### Requirements
 
@@ -48,11 +48,11 @@ Azure AD App → Has Mail.Send permission → Sends from shared mailbox
 
 ### Configuration
 
-\`\`\`
+```
 User → Authenticates → Uses their token → Sends from shared mailbox
        ↓
        Requires: User has "Send As" permission
-\`\`\`
+```
 
 ### Requirements
 

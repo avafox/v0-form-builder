@@ -9,20 +9,20 @@ Complete guide for testing the GPE Communications Tool API using Postman.
 ### 1. Import Collection and Environment
 
 **Import Collection:**
-\`\`\`
+```
 1. Open Postman
 2. Click "Import" button
 3. Select file: postman/GPE-Communications-API.postman_collection.json
 4. Click "Import"
-\`\`\`
+```
 
 **Import Environment:**
-\`\`\`
+```
 1. Click "Import" button
 2. Select file: postman/GPE-Communications-API.postman_environment.json
 3. Click "Import"
 4. Select the environment from dropdown (top right)
-\`\`\`
+```
 
 ### 2. Configure Environment Variables
 
@@ -54,7 +54,7 @@ Click the eye icon (top right) → Edit environment:
 5. Click "Send"
 
 **Expected Response (Authorized User):**
-\`\`\`json
+```json
 {
   "hasAccess": true,
   "groups": [
@@ -62,10 +62,10 @@ Click the eye icon (top right) → Edit environment:
   ],
   "cached": false
 }
-\`\`\`
+```
 
 **Expected Response (Unauthorized User):**
-\`\`\`json
+```json
 {
   "hasAccess": false,
   "groups": [
@@ -74,7 +74,7 @@ Click the eye icon (top right) → Edit environment:
   ],
   "cached": false
 }
-\`\`\`
+```
 
 ---
 
@@ -89,13 +89,13 @@ Click the eye icon (top right) → Edit environment:
 4. Click "Send"
 
 **Expected Response:**
-\`\`\`json
+```json
 {
   "hasAccess": true,
   "groups": ["a50fe9e4-09e6-48d0-95ae-2352eff997ba"],
   "cached": false
 }
-\`\`\`
+```
 
 **Note:** This requires application permissions (Mail.Send, etc.)
 
@@ -120,19 +120,19 @@ Click the eye icon (top right) → Edit environment:
 **Purpose:** Verify proper error responses
 
 **Test Missing Email:**
-\`\`\`
+```
 Request: "Check Access - Missing Email"
 Expected: 400 Bad Request
 Response: {"hasAccess": false, "error": "Email required"}
-\`\`\`
+```
 
 **Test Invalid Token:**
-\`\`\`
+```
 Request: "Check Access - With Token"
 Body: Invalid access token
 Expected: 500 Internal Server Error
 Response: {"hasAccess": false, "error": "Failed to check access"}
-\`\`\`
+```
 
 ---
 
@@ -149,11 +149,11 @@ Response: {"hasAccess": false, "error": "Failed to check access"}
 4. Click "Send"
 
 **Expected Response:**
-\`\`\`json
+```json
 {
   "success": true
 }
-\`\`\`
+```
 
 **Verify:**
 - Check recipient's inbox for email
@@ -171,11 +171,11 @@ Response: {"hasAccess": false, "error": "Failed to check access"}
 3. Click "Send"
 
 **Expected Response:**
-\`\`\`json
+```json
 {
   "success": true
 }
-\`\`\`
+```
 
 **Verify:**
 - TO recipient sees email
@@ -190,7 +190,7 @@ Response: {"hasAccess": false, "error": "Failed to check access"}
 
 **Method 1: Using Postman Request**
 
-\`\`\`
+```
 1. Open request: "Get Access Token (Manual)"
 2. Ensure environment variables are set:
    - client_id
@@ -199,11 +199,11 @@ Response: {"hasAccess": false, "error": "Failed to check access"}
 3. Click "Send"
 4. Copy the "access_token" from response
 5. Set it in environment variable "access_token"
-\`\`\`
+```
 
 **Method 2: Using Browser (Delegated)**
 
-\`\`\`
+```
 1. Go to: https://your-app.amplifyapp.com
 2. Sign in with Microsoft
 3. Open browser DevTools (F12)
@@ -211,17 +211,17 @@ Response: {"hasAccess": false, "error": "Failed to check access"}
 5. Find session cookie
 6. Copy the value
 7. Use in Postman requests
-\`\`\`
+```
 
 **Method 3: Using Azure CLI**
 
-\`\`\`bash
+```bash
 # Get token for Microsoft Graph
 az account get-access-token --resource https://graph.microsoft.com
 
 # Copy the "accessToken" value
 # Set in Postman environment variable
-\`\`\`
+```
 
 ---
 
@@ -290,24 +290,24 @@ az account get-access-token --resource https://graph.microsoft.com
 ### Using Newman (Postman CLI)
 
 **Install Newman:**
-\`\`\`bash
+```bash
 npm install -g newman
-\`\`\`
+```
 
 **Run Collection:**
-\`\`\`bash
+```bash
 newman run postman/GPE-Communications-API.postman_collection.json \
   -e postman/GPE-Communications-API.postman_environment.json \
   --reporters cli,json \
   --reporter-json-export results.json
-\`\`\`
+```
 
 **Run Specific Folder:**
-\`\`\`bash
+```bash
 newman run postman/GPE-Communications-API.postman_collection.json \
   -e postman/GPE-Communications-API.postman_environment.json \
   --folder "Access Control"
-\`\`\`
+```
 
 ---
 
@@ -315,7 +315,7 @@ newman run postman/GPE-Communications-API.postman_collection.json \
 
 ### GitHub Actions Example
 
-\`\`\`yaml
+```yaml
 name: API Tests
 
 on: [push, pull_request]
@@ -340,7 +340,7 @@ jobs:
             --env-var "client_id=$CLIENT_ID" \
             --env-var "client_secret=$CLIENT_SECRET" \
             --env-var "tenant_id=$TENANT_ID"
-\`\`\`
+```
 
 ---
 
@@ -351,12 +351,12 @@ jobs:
 **Cause:** App not running or wrong URL
 
 **Fix:**
-\`\`\`bash
+```bash
 # Verify app is running
 curl http://localhost:3000/api/health
 
 # Check base_url in environment matches your app
-\`\`\`
+```
 
 ---
 
@@ -425,14 +425,14 @@ curl http://localhost:3000/api/health
 ### Useful curl Commands
 
 **Check Access:**
-\`\`\`bash
+```bash
 curl -X POST http://localhost:3000/api/check-access \
   -H "Content-Type: application/json" \
   -d '{"email":"user@company.com","accessToken":"YOUR_TOKEN"}'
-\`\`\`
+```
 
 **Send Email:**
-\`\`\`bash
+```bash
 curl -X POST http://localhost:3000/api/send-email \
   -H "Content-Type: application/json" \
   -d '{
@@ -441,12 +441,12 @@ curl -X POST http://localhost:3000/api/send-email \
     "subject":"Test",
     "htmlContent":"<h1>Test</h1>"
   }'
-\`\`\`
+```
 
 **Health Check:**
-\`\`\`bash
+```bash
 curl http://localhost:3000/api/health
-\`\`\`
+```
 
 ---
 

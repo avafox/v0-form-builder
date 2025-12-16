@@ -26,7 +26,7 @@ If your organization doesn't support Microsoft Graph `Mail.Send` permission, you
 
 ### Option A: Office 365 Shared Mailbox
 
-\`\`\`
+```
 1. Create shared mailbox (if not already created):
    - Microsoft 365 Admin Center
    - Teams & groups → Shared mailboxes
@@ -44,11 +44,11 @@ If your organization doesn't support Microsoft Graph `Mail.Send` permission, you
    - Security → Additional security verification
    - Create app password for "GPE Communications Tool"
    - Save the generated password
-\`\`\`
+```
 
 ### Option B: Dedicated Service Account
 
-\`\`\`
+```
 1. Create a service account:
    - Azure AD → Users → New user
    - Username: gpe-comms-service@yourcompany.com
@@ -61,7 +61,7 @@ If your organization doesn't support Microsoft Graph `Mail.Send` permission, you
      -AccessRights SendAs
 
 3. Create app password for service account
-\`\`\`
+```
 
 ---
 
@@ -69,7 +69,7 @@ If your organization doesn't support Microsoft Graph `Mail.Send` permission, you
 
 Add these to your AWS Amplify environment variables:
 
-\`\`\`bash
+```bash
 # Email Method Selection
 EMAIL_METHOD=smtp
 
@@ -83,30 +83,30 @@ SMTP_PASSWORD=your-app-password-here
 # Alternative: Use service account
 # SMTP_USER=gpe-comms-service@yourcompany.com
 # SMTP_PASSWORD=service-account-app-password
-\`\`\`
+```
 
 ### SMTP Settings for Common Providers
 
 #### Office 365 / Outlook.com
-\`\`\`
+```
 SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
 SMTP_SECURE=false
-\`\`\`
+```
 
 #### Gmail (if needed for testing)
-\`\`\`
+```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
-\`\`\`
+```
 
 #### Exchange On-Premises
-\`\`\`
+```
 SMTP_HOST=mail.yourcompany.com
 SMTP_PORT=587
 SMTP_SECURE=false
-\`\`\`
+```
 
 ---
 
@@ -132,7 +132,7 @@ Since you're using SMTP, you can **remove** the Graph API email permissions:
 
 Create a test file to verify SMTP works:
 
-\`\`\`typescript
+```typescript
 // scripts/test-smtp.ts
 import { SMTPEmailService } from "../lib/smtp-email"
 
@@ -170,11 +170,11 @@ async function testSMTP() {
 }
 
 testSMTP().catch(console.error)
-\`\`\`
+```
 
 ### Run Test
 
-\`\`\`bash
+```bash
 # Set environment variables
 export SMTP_HOST=smtp.office365.com
 export SMTP_PORT=587
@@ -184,7 +184,7 @@ export SMTP_PASSWORD=your-app-password
 
 # Run test
 npx tsx scripts/test-smtp.ts
-\`\`\`
+```
 
 ---
 
@@ -192,7 +192,7 @@ npx tsx scripts/test-smtp.ts
 
 ### Add Environment Variables
 
-\`\`\`
+```
 1. AWS Amplify Console
 2. Your app → Environment variables
 3. Add:
@@ -203,7 +203,7 @@ npx tsx scripts/test-smtp.ts
    - SMTP_USER = gpe-communications@yourcompany.com
    - SMTP_PASSWORD = [your-app-password]
 4. Save and redeploy
-\`\`\`
+```
 
 ---
 
@@ -214,21 +214,21 @@ npx tsx scripts/test-smtp.ts
 **Cause:** Wrong username/password or MFA blocking
 
 **Fix:**
-\`\`\`
+```
 1. Verify SMTP_USER is correct email address
 2. If MFA enabled, create app password:
    - myaccount.microsoft.com → Security
    - Additional security verification
    - Create app password
 3. Use app password instead of regular password
-\`\`\`
+```
 
 ### Error: "Connection timeout"
 
 **Cause:** Wrong SMTP host or port, or firewall blocking
 
 **Fix:**
-\`\`\`
+```
 1. Verify SMTP_HOST is correct:
    - Office 365: smtp.office365.com
    - Exchange: mail.yourcompany.com
@@ -237,32 +237,32 @@ npx tsx scripts/test-smtp.ts
    - SSL: 465
 3. Check if corporate firewall blocks outbound SMTP
 4. Contact IT to allow SMTP traffic
-\`\`\`
+```
 
 ### Error: "Mailbox unavailable"
 
 **Cause:** Shared mailbox doesn't have SMTP AUTH enabled
 
 **Fix:**
-\`\`\`
+```
 1. Exchange Admin Center
 2. Recipients → Mailboxes
 3. Select shared mailbox
 4. Mailbox features → Email connectivity
 5. Enable: Authenticated SMTP
 6. Wait 15-30 minutes for changes to propagate
-\`\`\`
+```
 
 ### Error: "Relay access denied"
 
 **Cause:** Trying to send from address different than authenticated user
 
 **Fix:**
-\`\`\`
+```
 Option 1: Use service account with "Send As" permission
 Option 2: Ensure fromEmail matches SMTP_USER
 Option 3: Configure Exchange to allow relay
-\`\`\`
+```
 
 ---
 
@@ -270,36 +270,36 @@ Option 3: Configure Exchange to allow relay
 
 ### 1. Use App Passwords (Not Regular Passwords)
 
-\`\`\`
+```
 ✅ Create dedicated app password for this application
 ❌ Don't use your regular account password
 ❌ Don't share passwords across applications
-\`\`\`
+```
 
 ### 2. Rotate Credentials Regularly
 
-\`\`\`
+```
 - Change SMTP password every 6-12 months
 - Update AWS Amplify environment variables
 - Test after rotation
-\`\`\`
+```
 
 ### 3. Use Service Account (Recommended)
 
-\`\`\`
+```
 ✅ Create dedicated service account for app
 ✅ Grant only "Send As" permission needed
 ✅ No interactive login required
 ✅ Easier to audit and revoke
-\`\`\`
+```
 
 ### 4. Monitor Email Sending
 
-\`\`\`
+```
 - Log all email sends with user who triggered
 - Set up alerts for unusual sending patterns
 - Review sent items in shared mailbox regularly
-\`\`\`
+```
 
 ---
 
@@ -323,48 +323,48 @@ If you're switching from Graph API to SMTP:
 
 ### 1. Add SMTP Environment Variables
 
-\`\`\`bash
+```bash
 EMAIL_METHOD=smtp
 SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=gpe-communications@yourcompany.com
 SMTP_PASSWORD=your-app-password
-\`\`\`
+```
 
 ### 2. Keep Existing Variables (for access control)
 
-\`\`\`bash
+```bash
 # Keep these for authentication and access control
 MICROSOFT_CLIENT_ID=...
 MICROSOFT_TENANT_ID=...
 MICROSOFT_CLIENT_SECRET=...
-\`\`\`
+```
 
 ### 3. Test in Development
 
-\`\`\`bash
+```bash
 # Test locally first
 npm run dev
 # Send test email through UI
-\`\`\`
+```
 
 ### 4. Deploy to Production
 
-\`\`\`bash
+```bash
 # Update Amplify environment variables
 # Redeploy application
 # Test email sending in production
-\`\`\`
+```
 
 ### 5. Remove Graph Email Permissions (Optional)
 
-\`\`\`
+```
 1. Azure Portal → App registrations
 2. Your app → API permissions
 3. Remove: Mail.Send or Mail.Send.Shared
 4. Keep: User.Read, GroupMember.Read.All
-\`\`\`
+```
 
 ---
 

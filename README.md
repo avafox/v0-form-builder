@@ -36,27 +36,27 @@ This app allows the GPE team to create, manage, and send professional email comm
 
 ### 1. Clone and Install
 
-\`\`\`bash
+```bash
 git clone <your-repo-url>
 cd form-builder
 npm install
-\`\`\`
+```
 
 ### 2. Configure Environment Variables
 
 Copy `.env.example` to `.env.local` and fill in your values:
 
-\`\`\`bash
+```bash
 cp .env.example .env.local
-\`\`\`
+```
 
 See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed variable descriptions.
 
 ### 3. Run Development Server
 
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000)
 
@@ -64,7 +64,7 @@ Open [http://localhost:3000](http://localhost:3000)
 
 **Critical variables for AWS Amplify:**
 
-\`\`\`bash
+```bash
 # Authentication (Azure AD + NextAuth)
 MICROSOFT_CLIENT_ID=<azure-client-id>
 MICROSOFT_CLIENT_SECRET=<azure-client-secret>
@@ -89,7 +89,7 @@ SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 KV_URL=<upstash-url>
 KV_REST_API_TOKEN=<upstash-token>
 KV_REST_API_URL=<upstash-rest-url>
-\`\`\`
+```
 
 ## Documentation
 
@@ -103,14 +103,14 @@ Comprehensive documentation is available in the `/docs` folder:
 ## Architecture
 
 ### Authentication Flow
-\`\`\`
+```
 User → Azure AD Login → NextAuth → Protected Routes → App
-\`\`\`
+```
 
 ### Email Sending Flow
-\`\`\`
+```
 User → Form Submit → /api/send-email (Node.js) → AWS SES → Recipient
-\`\`\`
+```
 
 **Key Design Decisions:**
 
@@ -126,19 +126,19 @@ User → Form Submit → /api/send-email (Node.js) → AWS SES → Recipient
 
 The app auto-deploys when you push to the `main` branch:
 
-\`\`\`bash
+```bash
 git push origin main
-\`\`\`
+```
 
 Monitor deployment:
-\`\`\`
+```
 AWS Amplify Console → Deployments → View logs
-\`\`\`
+```
 
 **Important:** After changing environment variables in Amplify Console, manually redeploy:
-\`\`\`
+```
 Amplify Console → Actions → Redeploy this version
-\`\`\`
+```
 
 ### Manual Deployment Steps
 
@@ -156,10 +156,10 @@ See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for complete deployment instructi
 ### Debug Mode
 
 The app includes console logging for debugging. Look for:
-\`\`\`javascript
+```javascript
 console.log('[v0] Environment variables loaded:', { ... })
 console.log('[v0] Sending email to AWS SES...')
-\`\`\`
+```
 
 ## Common Issues
 

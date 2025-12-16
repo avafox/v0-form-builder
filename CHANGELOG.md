@@ -36,7 +36,7 @@ All notable changes to this project will be documented in this file.
 When making changes, add entries under the appropriate version:
 
 ### Format
-\`\`\`md
+```md
 ## [Version] - YYYY-MM-DD
 
 ### Added

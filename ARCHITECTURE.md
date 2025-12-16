@@ -101,7 +101,7 @@ The GPE Communications Hub is a Next.js-based web application designed to stream
 - Sky branding integration
 
 **Data Structure:**
-\`\`\`typescript
+```typescript
 interface CommunicationData {
   title: string
   greeting: string
@@ -112,7 +112,7 @@ interface CommunicationData {
   priority: "low" | "medium" | "high"
   department: string
 }
-\`\`\`
+```
 
 ### 3.3 Email Sending System
 **Location:** `app/api/send-email/route.ts`, `lib/microsoft-graph.ts`
@@ -174,7 +174,7 @@ interface CommunicationData {
 **Configuration:** `amplify.yml`
 
 **Build Settings:**
-\`\`\`yaml
+```yaml
 version: 1
 frontend:
   phases:
@@ -192,7 +192,7 @@ frontend:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
-\`\`\`
+```
 
 **Key Decisions:**
 - Use npm instead of pnpm (Amplify compatibility)
@@ -298,16 +298,16 @@ This data needs to be:
 ### 6.4 Technical Implementation
 
 **Caching Strategy:**
-\`\`\`typescript
+```typescript
 // Cache keys structure
 servicenow:change_requests     → JSON array of change requests
 servicenow:change_restrictions → JSON array of restrictions
 servicenow:approvals:gpe       → JSON array of GPE manager approvals
 servicenow:last_sync           → ISO timestamp of last sync
-\`\`\`
+```
 
 **Cache Flow:**
-\`\`\`
+```
 User Request → Next.js API Route
     ↓
 Check Redis Cache
@@ -319,7 +319,7 @@ Return Cached Data    Fetch from ServiceNow API
                       Store in Redis (TTL: 15 min)
                              ↓
                       Return Fresh Data
-\`\`\`
+```
 
 **API Routes:**
 - `/api/servicenow/changes` - Fetch change requests
@@ -351,7 +351,7 @@ Return Cached Data    Fetch from ServiceNow API
 **Component Location:** `components/servicenow-calendar.tsx`
 
 **Data Structure:**
-\`\`\`typescript
+```typescript
 interface CalendarEvent {
   id: string
   type: 'restriction' | 'approval' | 'change'
@@ -364,12 +364,12 @@ interface CalendarEvent {
   changeNumber?: string
   priority?: 'low' | 'medium' | 'high'
 }
-\`\`\`
+```
 
 ### 6.6 Environment Variables
 
 **Required for ServiceNow Integration:**
-\`\`\`env
+```env
 # ServiceNow API Configuration
 SERVICENOW_INSTANCE_URL=https://yourcompany.service-now.com
 SERVICENOW_CLIENT_ID=your-client-id
@@ -381,7 +381,7 @@ SERVICENOW_PASSWORD=your-password
 # Upstash Redis (for caching)
 KV_REST_API_URL=your-upstash-url
 KV_REST_API_TOKEN=your-upstash-token
-\`\`\`
+```
 
 ### 6.7 Sync Mechanism
 
@@ -524,7 +524,7 @@ KV_REST_API_TOKEN=your-upstash-token
 
 ## 9. File Structure
 
-\`\`\`
+```
 ├── app/
 │   ├── api/
 │   │   ├── send-email/
@@ -565,7 +565,7 @@ KV_REST_API_TOKEN=your-upstash-token
 ├── next.config.mjs                # Next.js configuration
 ├── package.json                   # Dependencies
 └── tsconfig.json                  # TypeScript configuration
-\`\`\`
+```
 
 ---
 
@@ -596,7 +596,7 @@ KV_REST_API_TOKEN=your-upstash-token
 ## 11. Environment Configuration
 
 ### Required Environment Variables
-\`\`\`env
+```env
 # Microsoft Graph API (Email Sending)
 MICROSOFT_CLIENT_ID=your-client-id
 MICROSOFT_TENANT_ID=your-tenant-id
@@ -627,7 +627,7 @@ POSTGRES_USER=your-user
 POSTGRES_PASSWORD=your-password
 POSTGRES_DATABASE=your-database
 POSTGRES_HOST=your-host
-\`\`\`
+```
 
 ---
 

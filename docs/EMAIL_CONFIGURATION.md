@@ -34,7 +34,7 @@ The app supports three email sending methods:
 
 **Environment Variables:**
 
-\`\`\`bash
+```bash
 EMAIL_METHOD=smtp
 
 SMTP_HOST=smtp.office365.com
@@ -44,7 +44,7 @@ SMTP_USER=cti-cbp-gpe-communications@sky.uk
 SMTP_PASSWORD=your-mailbox-password
 SMTP_FROM_EMAIL=cti-cbp-gpe-communications@sky.uk
 SMTP_FROM_NAME=GPE Communications Team
-\`\`\`
+```
 
 **Azure AD Permissions Needed:**
 - User.Read (Delegated)
@@ -54,9 +54,9 @@ SMTP_FROM_NAME=GPE Communications Team
 - None
 
 **Test:**
-\`\`\`bash
+```bash
 npx tsx scripts/test-smtp.tsx
-\`\`\`
+```
 
 ---
 
@@ -64,13 +64,13 @@ npx tsx scripts/test-smtp.tsx
 
 **Environment Variables:**
 
-\`\`\`bash
+```bash
 EMAIL_METHOD=graph
 
 MICROSOFT_CLIENT_ID=your-client-id
 MICROSOFT_TENANT_ID=your-tenant-id
 MICROSOFT_CLIENT_SECRET=your-client-secret
-\`\`\`
+```
 
 **Azure AD Permissions Needed:**
 - User.Read (Delegated)

@@ -119,7 +119,7 @@ This guide outlines the maintenance procedures for the GPE Communications Tool t
 ## Security Best Practices
 
 ### 1. Regular Security Audits
-\`\`\`bash
+```bash
 # Run weekly
 npm audit
 
@@ -128,7 +128,7 @@ npm audit fix
 
 # For high/critical only
 npm audit fix --audit-level=high
-\`\`\`
+```
 
 ### 2. Dependency Scanning
 - Enable GitHub Dependabot alerts
@@ -154,13 +154,13 @@ npm audit fix --audit-level=high
 ### Metrics to Track
 
 **Build Performance**
-\`\`\`bash
+```bash
 # Check build time
 time npm run build
 
 # Analyze bundle size
 npx @next/bundle-analyzer
-\`\`\`
+```
 
 **Runtime Performance**
 - Monitor Amplify CloudWatch metrics
@@ -195,7 +195,7 @@ npx @next/bundle-analyzer
 ## Testing Strategy
 
 ### Automated Tests
-\`\`\`bash
+```bash
 # Run all tests
 npm test
 
@@ -204,7 +204,7 @@ npm test -- --coverage
 
 # Run specific test suite
 npm test -- auth
-\`\`\`
+```
 
 ### Manual Testing Checklist
 - [ ] Authentication flow (Microsoft login)
@@ -221,14 +221,14 @@ npm test -- auth
 ### If Update Breaks Production
 
 **1. Immediate Rollback**
-\`\`\`bash
+```bash
 # Revert to previous commit
 git revert HEAD
 git push origin main
 
 # Or rollback in Amplify Console
 # Amplify Console → Deployments → Redeploy previous version
-\`\`\`
+```
 
 **2. Investigate**
 - Check Amplify logs
@@ -272,7 +272,7 @@ git push origin main
 
 ## Useful Commands
 
-\`\`\`bash
+```bash
 # Check for outdated packages
 npm outdated
 
@@ -305,7 +305,7 @@ npm run format
 
 # Lint code
 npm run lint
-\`\`\`
+```
 
 ---
 

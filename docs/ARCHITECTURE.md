@@ -25,7 +25,7 @@ Integrated CI/CD, automatic deployments from Git, SSR support for Next.js.
 
 ## Project Structure
 
-\`\`\`
+```
 /app
   /api
     /send-email        # SES email sending endpoint
@@ -46,24 +46,24 @@ Integrated CI/CD, automatic deployments from Git, SSR support for Next.js.
   utils.ts             # Utilities
 
 /scripts               # Database migrations (SQL)
-\`\`\`
+```
 
 ## Data Flow
 
 ### Authentication Flow
-\`\`\`
+```
 User → Azure AD Login → NextAuth → Protected Routes → App
-\`\`\`
+```
 
 ### Email Sending Flow
-\`\`\`
+```
 User → Form Submit → /api/send-email → AWS SES → Recipient
-\`\`\`
+```
 
 ### Form Data Storage
-\`\`\`
+```
 User → Form → Supabase (communications table) → Redis Cache
-\`\`\`
+```
 
 ## Environment Variables
 

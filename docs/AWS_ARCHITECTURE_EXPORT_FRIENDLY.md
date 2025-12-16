@@ -4,7 +4,7 @@
 
 ## Main Architecture (Simplified for Export)
 
-\`\`\`mermaid
+```mermaid
 graph TB
     Users[Internal Users via VPN]
     R53[Route 53 Private DNS]
@@ -28,11 +28,11 @@ graph TB
     style EntraID fill:#0078D4
     style Redis fill:#DC382D
     style SNOW fill:#62D84E
-\`\`\`
+```
 
 ## Authentication Flow (Linear)
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant User
     participant Amplify
@@ -49,11 +49,11 @@ sequenceDiagram
     Graph->>Redis: 7. Cache Groups
     Redis->>Amplify: 8. Return Access Decision
     Amplify->>User: 9. Show App or Deny
-\`\`\`
+```
 
 ## ServiceNow Integration Flow
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant User
     participant NextJS
@@ -70,11 +70,11 @@ sequenceDiagram
         NextJS->>Redis: Store in Cache
     end
     NextJS->>User: Display Calendar
-\`\`\`
+```
 
 ## CI/CD Pipeline (Simplified)
 
-\`\`\`mermaid
+```mermaid
 graph LR
     Dev[Developer] --> Git[GitHub Push]
     Git --> Amplify[Amplify Build]
@@ -85,11 +85,11 @@ graph LR
     style Git fill:#181717
     style Amplify fill:#FF9900
     style Live fill:#00C853
-\`\`\`
+```
 
 ## Component Architecture
 
-\`\`\`mermaid
+```mermaid
 graph TD
     App[Next.js Application]
     Pages[Pages Layer]
@@ -107,11 +107,11 @@ graph TD
     Lib --> Access[Access Control]
     Lib --> Graph[Graph API]
     Lib --> Cache[Redis Cache]
-\`\`\`
+```
 
 ## Network Architecture
 
-\`\`\`mermaid
+```mermaid
 graph TB
     Internet[Internet]
     VPN[Corporate VPN]
@@ -129,7 +129,7 @@ graph TB
     style WAF fill:#DD4814
     style VPN fill:#0078D4
     style Amplify fill:#FF9900
-\`\`\`
+```
 
 ---
 
@@ -137,7 +137,7 @@ graph TB
 
 ### Method 1: Mermaid CLI (Best Quality)
 
-\`\`\`bash
+```bash
 # Install Mermaid CLI
 npm install -g @mermaid-js/mermaid-cli
 
@@ -149,7 +149,7 @@ mmdc -i docs/AWS_ARCHITECTURE_EXPORT_FRIENDLY.md -o architecture.svg
 
 # Export to PDF
 mmdc -i docs/AWS_ARCHITECTURE_EXPORT_FRIENDLY.md -o architecture.pdf
-\`\`\`
+```
 
 ### Method 2: Online Tools
 
@@ -165,13 +165,13 @@ mmdc -i docs/AWS_ARCHITECTURE_EXPORT_FRIENDLY.md -o architecture.pdf
 
 ### Method 3: VS Code Extension
 
-\`\`\`bash
+```bash
 # Install extension
 code --install-extension bierner.markdown-mermaid
 
 # Open markdown file
 # Right-click diagram → "Export Mermaid Diagram"
-\`\`\`
+```
 
 ---
 
@@ -198,13 +198,13 @@ code --install-extension bierner.markdown-mermaid
 **Cause:** PNG export at low resolution
 
 **Fix:**
-\`\`\`bash
+```bash
 # Use high DPI
 mmdc -i diagram.md -o output.png -s 3
 
 # Or export to SVG (vector, always sharp)
 mmdc -i diagram.md -o output.svg
-\`\`\`
+```
 
 ### Issue: Colors don't export
 
@@ -224,20 +224,20 @@ For presentations, use this approach:
 
 Or use this pre-formatted structure:
 
-\`\`\`
+```
 Slide 1: Main Architecture Overview
 Slide 2: Authentication Flow
 Slide 3: ServiceNow Integration
 Slide 4: CI/CD Pipeline
 Slide 5: Security Layers
 Slide 6: Cost Breakdown
-\`\`\`
+```
 
 ---
 
 ## Quick Reference: Export Commands
 
-\`\`\`bash
+```bash
 # All diagrams to PNG
 mmdc -i docs/AWS_ARCHITECTURE_EXPORT_FRIENDLY.md -o diagrams/
 

@@ -18,39 +18,39 @@ This guide explains how to configure **delegated permissions** instead of high-p
 
 ### Step 1: Remove Old Application Permissions
 
-\`\`\`
+```
 1. Azure Portal → App Registrations → Your App
 2. API Permissions
 3. Remove these permissions:
    - Directory.Read.All (Application)
    - User.Read.All (Application)
    - GroupMember.Read.All (Application)
-\`\`\`
+```
 
 ### Step 2: Add Delegated Permissions
 
-\`\`\`
+```
 1. API Permissions → Add a permission
 2. Microsoft Graph → Delegated permissions
 3. Add:
    - User.Read
    - GroupMember.Read.All
 4. Grant admin consent (if required)
-\`\`\`
+```
 
 ### Step 3: Configure Group IDs
 
 Edit `lib/access-control.ts`:
 
-\`\`\`typescript
+```typescript
 export const ALLOWED_GROUPS = [
   'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', // Your actual group ID
 ]
-\`\`\`
+```
 
 **To find group IDs:**
 
-\`\`\`bash
+```bash
 # Azure Portal
 Azure AD → Groups → [Your Group] → Copy Object ID
 
@@ -59,7 +59,7 @@ Get-AzureADGroup -SearchString "GPE-Communications" | Select ObjectId
 
 # Graph Explorer
 GET https://graph.microsoft.com/v1.0/groups?$filter=startswith(displayName,'GPE')
-\`\`\`
+```
 
 ## Implementation Details
 
@@ -73,7 +73,7 @@ GET https://graph.microsoft.com/v1.0/groups?$filter=startswith(displayName,'GPE'
 
 ### Code Flow
 
-\`\`\`typescript
+```typescript
 // 1. User authenticates
 const session = await getServerSession()
 
@@ -82,38 +82,38 @@ const groups = await getUserGroups(email, session.accessToken)
 
 // 3. Check if user is in allowed groups
 const hasAccess = checkUserAccess(groups)
-\`\`\`
+```
 
 ## Testing
 
 ### Test Access Control
 
-\`\`\`bash
+```bash
 # Test with user email
 curl -X POST http://localhost:3000/api/check-access \
   -H "Content-Type: application/json" \
   -d '{"email":"user@company.com"}'
-\`\`\`
+```
 
 ### Expected Responses
 
 **User in allowed group:**
-\`\`\`json
+```json
 {
   "hasAccess": true,
   "groups": ["xxx-xxx-xxx"],
   "cached": false
 }
-\`\`\`
+```
 
 **User not in allowed group:**
-\`\`\`json
+```json
 {
   "hasAccess": false,
   "groups": ["yyy-yyy-yyy"],
   "cached": false
 }
-\`\`\`
+```
 
 ## Security Benefits
 
@@ -167,13 +167,13 @@ If you're migrating from the old high-privilege approach:
 
 Required variables remain the same:
 
-\`\`\`bash
+```bash
 MICROSOFT_CLIENT_ID=your-client-id
 MICROSOFT_TENANT_ID=your-tenant-id
 MICROSOFT_CLIENT_SECRET=your-client-secret
 KV_REST_API_URL=your-redis-url
 KV_REST_API_TOKEN=your-redis-token
-\`\`\`
+```
 
 ## Next Steps
 

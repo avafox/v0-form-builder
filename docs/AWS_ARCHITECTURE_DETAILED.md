@@ -12,7 +12,7 @@
 
 ## High-Level Architecture
 
-\`\`\`mermaid
+```mermaid
 graph TB
     subgraph "Corporate Network"
         Users[Internal Users<br/>via VPN/Corporate Network]
@@ -76,7 +76,7 @@ graph TB
     class EntraID,Graph azure
     class SNOW,SNOWTables servicenow
     class Redis cache
-\`\`\`
+```
 
 ---
 
@@ -84,7 +84,7 @@ graph TB
 
 ### 1. Authentication Flow (Detailed)
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant User
     participant Amplify
@@ -127,11 +127,11 @@ sequenceDiagram
     else Unauthorized
         Middleware->>User: 21. Redirect to /access-denied
     end
-\`\`\`
+```
 
 ### 2. ServiceNow Integration Flow (Detailed)
 
-\`\`\`mermaid
+```mermaid
 sequenceDiagram
     participant User
     participant Calendar as Calendar Component
@@ -166,11 +166,11 @@ sequenceDiagram
     end
     
     Calendar->>User: 16. Render calendar with events
-\`\`\`
+```
 
 ### 3. Access Control Decision Flow
 
-\`\`\`mermaid
+```mermaid
 flowchart TD
     Start([User Requests Protected Page]) --> Auth{Authenticated?}
     
@@ -205,7 +205,7 @@ flowchart TD
     style Auth fill:#2196F3,stroke:#1565C0,color:#fff
     style Compare fill:#2196F3,stroke:#1565C0,color:#fff
     style CheckCache fill:#FF9800,stroke:#E65100,color:#fff
-\`\`\`
+```
 
 ---
 
@@ -256,7 +256,7 @@ flowchart TD
 
 ## CI/CD Pipeline
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     subgraph "Developer Workflow"
         Dev[Developer] -->|1. Code Changes| Local[Local Development]
@@ -304,11 +304,11 @@ flowchart LR
     style Deploy fill:#4CAF50,stroke:#2E7D32
     style Test fill:#2196F3,stroke:#1565C0
     style Rollback fill:#f44336,stroke:#c62828
-\`\`\`
+```
 
 ### Build Configuration (amplify.yml)
 
-\`\`\`yaml
+```yaml
 version: 1
 frontend:
   phases:
@@ -327,7 +327,7 @@ frontend:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
-\`\`\`
+```
 
 ### Deployment Stages
 
@@ -342,7 +342,7 @@ frontend:
 
 ### Branch Deployment Strategy
 
-\`\`\`mermaid
+```mermaid
 gitGraph
     commit id: "Initial"
     branch develop
@@ -352,7 +352,7 @@ gitGraph
     checkout main
     merge develop id: "Release v1.1"
     commit id: "Hotfix" tag: "v1.1.1"
-\`\`\`
+```
 
 | Branch | Environment | URL | Auto-Deploy |
 |--------|-------------|-----|-------------|
@@ -366,7 +366,7 @@ gitGraph
 
 ### Defense in Depth Layers
 
-\`\`\`mermaid
+```mermaid
 flowchart TB
     subgraph "Layer 1: Network Security"
         VPN[Corporate VPN Required]
@@ -415,7 +415,7 @@ flowchart TB
     style OAuth fill:#FF9800,stroke:#E65100,color:#fff
     style Groups fill:#4CAF50,stroke:#2E7D32,color:#fff
     style Encryption fill:#2196F3,stroke:#1565C0,color:#fff
-\`\`\`
+```
 
 ### Security Controls Matrix
 
@@ -456,7 +456,7 @@ flowchart TB
 
 ### Caching Strategy
 
-\`\`\`mermaid
+```mermaid
 flowchart LR
     subgraph "Client Side"
         Browser[Browser Cache<br/>Static Assets<br/>24 hours]
@@ -483,7 +483,7 @@ flowchart LR
     style Browser fill:#4CAF50,stroke:#2E7D32
     style CloudFront fill:#FF9800,stroke:#E65100
     style Redis fill:#DC382D,stroke:#8B0000,color:#fff
-\`\`\`
+```
 
 ### Performance Metrics
 
@@ -531,7 +531,7 @@ flowchart LR
 
 ### CloudWatch Dashboards
 
-\`\`\`mermaid
+```mermaid
 graph TB
     subgraph "Metrics Collection"
         Amplify[Amplify Metrics] --> CW[CloudWatch]
@@ -561,7 +561,7 @@ graph TB
 
     style CW fill:#FF9900,stroke:#232F3E
     style SNS fill:#f44336,stroke:#c62828,color:#fff
-\`\`\`
+```
 
 ### Alert Thresholds
 
@@ -587,22 +587,22 @@ This documentation is available in multiple formats:
 
 ### Generate PDF
 
-\`\`\`bash
+```bash
 # Using pandoc
 pandoc docs/AWS_ARCHITECTURE_DETAILED.md -o AWS_Architecture.pdf
 
 # Using markdown-pdf
 npm install -g markdown-pdf
 markdown-pdf docs/AWS_ARCHITECTURE_DETAILED.md
-\`\`\`
+```
 
 ### Generate Images from Mermaid
 
-\`\`\`bash
+```bash
 # Using mermaid-cli
 npm install -g @mermaid-js/mermaid-cli
 mmdc -i docs/AWS_ARCHITECTURE_DETAILED.md -o diagrams/
-\`\`\`
+```
 
 ---
 
