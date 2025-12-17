@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Mail, Send, Slack, FileText, ArrowLeft, Home } from "lucide-react"
+import DOMPurify from "isomorphic-dompurify"
 
 interface CommunicationData {
   title: string
@@ -96,7 +97,7 @@ export function CommunicationsTemplate() {
   }
 
   const formatTextForDisplay = (text: string) => {
-    return text
+    const unsafeHtml = text
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
       .replace(/__(.*?)__/g, "<u>$1</u>")
@@ -104,6 +105,13 @@ export function CommunicationsTemplate() {
         /\[([^\]]+)\]$$([^)]+)$$/g,
         '<a href="$2" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: underline;">$1</a>',
       )
+
+    // Sanitize HTML to prevent XSS attacks
+    return DOMPurify.sanitize(unsafeHtml, {
+      ALLOWED_TAGS: ["strong", "em", "u", "a", "br"],
+      ALLOWED_ATTR: ["href", "target", "rel", "style"],
+      ALLOW_DATA_ATTR: false,
+    })
   }
 
   const generatePlainTextEmail = () => {
