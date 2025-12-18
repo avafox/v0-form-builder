@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-import DOMPurify from "isomorphic-dompurify"
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -29,16 +28,11 @@ export function RichTextEditor({ value, onChange, placeholder, rows = 4, classNa
   }, [value, isEditing])
 
   const convertToHTML = (text: string) => {
-    const unsafeHtml = text
+    return text
       .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       .replace(/\*(.*?)\*/g, "<em>$1</em>")
       .replace(/__(.*?)__/g, "<u>$1</u>")
       .replace(/\n/g, "<br>")
-
-    return DOMPurify.sanitize(unsafeHtml, {
-      ALLOWED_TAGS: ["strong", "em", "u", "br"],
-      ALLOWED_ATTR: [],
-    })
   }
 
   const convertFromHTML = (html: string) => {

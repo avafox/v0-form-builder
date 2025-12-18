@@ -6,10 +6,6 @@ frontend:
         - nvm install 20
         - nvm use 20
         - node --version
-        - export RESEND_API_KEY=$RESEND_API_KEY
-        - export RESEND_FROM_EMAIL=$RESEND_FROM_EMAIL
-        - export RESEND_FROM_NAME=$RESEND_FROM_NAME
-        - export EMAIL_PROVIDER=$EMAIL_PROVIDER
         - export SES_REGION=$SES_REGION
         - export SES_ACCESS_KEY_ID=$SES_ACCESS_KEY_ID
         - export SES_SECRET_ACCESS_KEY=$SES_SECRET_ACCESS_KEY
@@ -23,10 +19,6 @@ frontend:
         - npm install --legacy-peer-deps
     build:
       commands:
-        - export RESEND_API_KEY=$RESEND_API_KEY
-        - export RESEND_FROM_EMAIL=$RESEND_FROM_EMAIL
-        - export RESEND_FROM_NAME=$RESEND_FROM_NAME
-        - export EMAIL_PROVIDER=$EMAIL_PROVIDER
         - export SES_REGION=$SES_REGION
         - export SES_ACCESS_KEY_ID=$SES_ACCESS_KEY_ID
         - export SES_SECRET_ACCESS_KEY=$SES_SECRET_ACCESS_KEY

@@ -6,14 +6,7 @@ export const runtime = "nodejs"
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
-    const toEmailRaw = searchParams.get("to") || "ava.foxwell@sky.uk"
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(toEmailRaw)) {
-      return NextResponse.json({ error: "Invalid email address format" }, { status: 400 })
-    }
-
-    const toEmail = toEmailRaw
+    const toEmail = searchParams.get("to") || "ava.foxwell@sky.uk"
 
     console.log("[v0] Sending simple test email to:", toEmail)
 
