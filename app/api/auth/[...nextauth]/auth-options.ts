@@ -1,28 +1,12 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-const requiredEnvVars = {
-  MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
-  MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
-  MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-}
-
-const missingVars = Object.entries(requiredEnvVars)
-  .filter(([_, value]) => !value)
-  .map(([key]) => key)
-
-if (missingVars.length > 0) {
-  console.error("[v0] Missing required environment variables:", missingVars)
-  throw new Error(`Missing required environment variables: ${missingVars.join(", ")}`)
-}
-
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
+      clientId: process.env.MICROSOFT_CLIENT_ID || "",
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: process.env.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -60,5 +44,5 @@ export const authOptions: AuthOptions = {
     error: "/auth/error",
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true, // Enable debug mode to see detailed error logs
+  debug: process.env.NODE_ENV === "development",
 }
