@@ -53,6 +53,7 @@ export function CommunicationsTemplate() {
     bccRecipients: "",
     customSubject: "",
     senderEmail: "cti-gpe-communications@sky.uk",
+    provider: "resend" as "ses" | "resend",
   })
   const [commData, setCommData] = useState<CommunicationData>({
     title: "System Maintenance Notification",
@@ -152,7 +153,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
 
   const sendViaAzure = async () => {
     try {
-      console.log("[v0] Starting SES email send...")
+      console.log("[v0] Starting email send via", emailSettings.provider.toUpperCase(), "...")
 
       // Validate required fields
       if (!emailSettings.recipients) {
@@ -193,15 +194,16 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
             .filter((email) => email.length > 0)
         : undefined
 
-      console.log("[v0] Sending email via SES with:", {
+      console.log(`[v0] Sending email via ${emailSettings.provider.toUpperCase()} with:`, {
         from: emailSettings.senderEmail,
         to: toEmails,
         cc: ccEmails,
         bcc: bccEmails,
         subject,
+        provider: emailSettings.provider,
       })
 
-      // Call the SES API
+      // Call the API
       const response = await fetch("/api/send-email", {
         method: "POST",
         headers: {
@@ -214,25 +216,27 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
           htmlContent: htmlContent,
           cc: ccEmails,
           bcc: bccEmails,
+          provider: emailSettings.provider,
         }),
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        console.log("[v0] Email sent successfully via SES:", result)
+        const providerName = result.provider === "resend" ? "Resend" : "AWS SES"
+        console.log(`[v0] Email sent successfully via ${providerName}:`, result)
         alert(
-          `✅ Email sent successfully!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered via AWS SES.`,
+          `✅ Email sent successfully via ${providerName}!\n\nSent to: ${toEmails.join(", ")}\nFrom: ${emailSettings.senderEmail}\n\nThe styled communication has been delivered.`,
         )
         setIsOutlookDialogOpen(false)
       } else {
-        console.error("[v0] SES email send failed:", result)
+        console.error("[v0] Email send failed:", result)
         alert(
-          `❌ Failed to send email:\n\n${result.error || "Unknown error"}\n\nPlease check:\n1. AWS SES credentials are configured\n2. Sender email is verified in AWS SES\n3. You have production access (or recipient is verified)`,
+          `❌ Failed to send email:\n\n${result.error || "Unknown error"}\n\nMessage: ${result.message || "Please check your email service configuration."}`,
         )
       }
     } catch (error) {
-      console.error("[v0] Error sending via SES:", error)
+      console.error("[v0] Error sending email:", error)
       alert(`❌ Failed to send email: ${error.message}`)
     }
   }
@@ -972,9 +976,26 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
-                  <DialogTitle>Send via AWS SES</DialogTitle>
+                  <DialogTitle>Send Communication via Email</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="provider">Email Service</Label>
+                    <select
+                      id="provider"
+                      value={emailSettings.provider}
+                      onChange={(e) => updateEmailSetting("provider", e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="resend">Resend (Recommended)</option>
+                      <option value="ses">AWS SES</option>
+                    </select>
+                    <p className="text-xs text-gray-600">
+                      {emailSettings.provider === "resend"
+                        ? "Resend provides reliable email delivery with better inbox placement"
+                        : "AWS SES requires verified sender addresses and may have delivery issues"}
+                    </p>
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="sender">From (Sender Email)</Label>
                     <Input
@@ -984,7 +1005,11 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                       className="bg-gray-50"
                       placeholder="cti-gpe-communications@sky.uk"
                     />
-                    <p className="text-xs text-gray-600">Verified AWS SES sender address</p>
+                    <p className="text-xs text-gray-600">
+                      {emailSettings.provider === "resend"
+                        ? "Configured in Resend dashboard"
+                        : "Verified AWS SES sender address"}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="recipients">To (Recipients)</Label>
@@ -1026,9 +1051,13 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                   <div className="mt-2">
                     <Button onClick={sendViaAzure} className="w-full bg-blue-600 hover:bg-blue-700">
                       <Send className="h-4 w-4 mr-2" />
-                      Send via AWS SES
+                      Send via {emailSettings.provider === "resend" ? "Resend" : "AWS SES"}
                     </Button>
-                    <p className="text-xs text-gray-600 mt-2">Sends email through AWS Simple Email Service (SES)</p>
+                    <p className="text-xs text-gray-600 mt-2">
+                      {emailSettings.provider === "resend"
+                        ? "Sends email through Resend API with formatted HTML content"
+                        : "Sends email through AWS Simple Email Service (SES)"}
+                    </p>
                   </div>
                 </div>
               </DialogContent>
