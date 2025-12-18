@@ -2,18 +2,22 @@
 
 import Image from "next/image"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Sparkles, Zap, FileCheck } from "lucide-react"
 
 export default function HomePage() {
-  // const { data: session } = useSession()
+  const { data: session, status } = useSession()
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <Image src="/sky-logo.png" alt="Sky Logo" width={80} height={40} className="h-10 w-auto" priority />
+          {status === "authenticated" && session?.user?.email && (
+            <p className="text-sm text-gray-600">Signed in as {session.user.email}</p>
+          )}
         </div>
       </header>
 
@@ -24,9 +28,9 @@ export default function HomePage() {
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
             Create professional, branded email communications in minutes
           </p>
-          <Link href="/communications">
+          <Link href={status === "authenticated" ? "/communications" : "/auth/signin"}>
             <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6 h-auto">
-              Start Creating
+              {status === "authenticated" ? "Start Creating" : "Sign In to Start"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
@@ -90,12 +94,12 @@ export default function HomePage() {
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
             Create your first communication now and see how easy it is
           </p>
-          <Link href="/communications">
+          <Link href={status === "authenticated" ? "/communications" : "/auth/signin"}>
             <Button
               size="lg"
               className="bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 text-white hover:opacity-90 text-lg px-8 py-6 h-auto"
             >
-              Launch Communications Builder
+              {status === "authenticated" ? "Launch Communications Builder" : "Sign In to Continue"}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
