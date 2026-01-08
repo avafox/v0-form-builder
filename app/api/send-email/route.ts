@@ -1,11 +1,30 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { AWSSESEmailService } from "@/lib/aws-ses-email"
 import { ResendEmailService } from "@/lib/resend-email"
+import { emailRateLimiter, getClientIP } from "@/lib/rate-limit"
 
 export const runtime = "nodejs"
 
 export async function POST(request: NextRequest) {
   try {
+    const clientIP = getClientIP(request)
+    const { success, limit, remaining, reset } = await emailRateLimiter.limit(clientIP)
+
+    if (!success) {
+      console.warn(`[Security] Rate limit exceeded for IP: ${clientIP}`)
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Limit": limit.toString(),
+            "X-RateLimit-Remaining": remaining.toString(),
+            "X-RateLimit-Reset": reset.toString(),
+          },
+        },
+      )
+    }
+
     console.log("[v0] Received email send request")
 
     const { fromEmail, to, cc, bcc, subject, htmlContent, provider } = await request.json()
