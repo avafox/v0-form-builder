@@ -1,23 +1,32 @@
 graph TB
-    Users[Internal Users via VPN]
-    R53[Route 53 Private DNS]
-    WAF[AWS WAF IP Filter]
-    Amplify[AWS Amplify Next.js App]
-    Redis[Upstash Redis Cache]
-    EntraID[Microsoft Entra ID]
-    Graph[Microsoft Graph API]
-    SNOW[ServiceNow API]
+    subgraph "Sky UK Corporate"
+        Users[Sky UK Users<br/>@sky.uk]
+    end
+
+    subgraph "AWS Cloud"
+        Amplify[AWS Amplify<br/>Next.js 15 App<br/>main.xxxxx.amplifyapp.com]
+        SES[AWS SES<br/>Email Service<br/>eu-west-2]
+    end
+
+    subgraph "Microsoft Azure"
+        EntraID[Microsoft Entra ID<br/>Azure AD SSO<br/>Authentication Only]
+    end
+
+    subgraph "Third Party Services"
+        Supabase[(Supabase<br/>PostgreSQL + RLS<br/>Database)]
+        Redis[(Upstash Redis<br/>Cache Layer)]
+    end
+
+    Users -->|1. Access App| Amplify
+    Amplify -->|2. SSO Login| EntraID
+    EntraID -->|3. OAuth Token| Amplify
+    Amplify -->|4. Store/Retrieve Data| Supabase
+    Amplify -->|5. Cache Data| Redis
+    Amplify -->|6. Send Email| SES
+    SES -->|7. Deliver Email| Users
     
-    Users --> R53
-    R53 --> WAF
-    WAF --> Amplify
-    Amplify --> EntraID
-    Amplify --> Redis
-    Amplify --> Graph
-    Amplify --> SNOW
-    Graph --> EntraID
-    
-    style Amplify fill:#FF9900
-    style EntraID fill:#0078D4
-    style Redis fill:#DC382D
-    style SNOW fill:#62D84E
+    style Amplify fill:#FF9900,stroke:#232F3E,color:#000
+    style SES fill:#FF9900,stroke:#232F3E,color:#000
+    style EntraID fill:#0078D4,stroke:#003366,color:#fff
+    style Supabase fill:#3ECF8E,stroke:#2E7D32,color:#000
+    style Redis fill:#DC382D,stroke:#8B0000,color:#fff

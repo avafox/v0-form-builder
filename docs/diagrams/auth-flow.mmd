@@ -1,16 +1,20 @@
 sequenceDiagram
     participant User
-    participant Amplify
-    participant EntraID
-    participant Graph
-    participant Redis
+    participant Amplify as Next.js App<br/>(Amplify)
+    participant EntraID as Microsoft Entra ID
+    participant AccessControl as Access Control<br/>(Email Whitelist)
     
-    User->>Amplify: 1. Access App
-    Amplify->>EntraID: 2. Redirect to Login
-    EntraID->>User: 3. Login Page
-    User->>EntraID: 4. Enter Credentials
-    EntraID->>Amplify: 5. OAuth Token
-    Amplify->>Graph: 6. Get User Groups
-    Graph->>Redis: 7. Cache Groups
-    Redis->>Amplify: 8. Return Access Decision
-    Amplify->>User: 9. Show App or Deny
+    User->>Amplify: 1. Access /communications
+    Amplify->>EntraID: 2. Redirect to Microsoft Login
+    EntraID->>User: 3. Show Login Page
+    User->>EntraID: 4. Enter Sky UK Credentials
+    EntraID->>Amplify: 5. Return OAuth Token + User Info
+    Amplify->>AccessControl: 6. Check Email Domain (@sky.uk)
+    
+    alt Email Allowed
+        AccessControl->>Amplify: 7a. Access Granted
+        Amplify->>User: 8a. Show Communications Page
+    else Email Not Allowed
+        AccessControl->>Amplify: 7b. Access Denied
+        Amplify->>User: 8b. Show Access Denied Page
+    end

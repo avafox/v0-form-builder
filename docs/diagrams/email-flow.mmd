@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant User
+    participant Form as Communications Form
+    participant API as /api/send-email
+    participant SES as AWS SES<br/>(eu-west-2)
+    participant Recipient as Sky UK Recipient
+
+    User->>Form: 1. Fill Communication Form
+    User->>Form: 2. Click "Send via AWS SES"
+    Form->>Form: 3. generateEmailHTML()
+    Note over Form: Creates styled HTML<br/>with gradients, sections,<br/>contact info (~7500 chars)
+    Form->>API: 4. POST /api/send-email<br/>{to, subject, htmlContent}
+    API->>API: 5. Load SES credentials<br/>(SES_* env vars)
+    API->>API: 6. AWS Signature V4 signing
+    API->>SES: 7. POST /v2/email/outbound-emails
+    SES->>API: 8. 200 OK + MessageId
+    API->>Form: 9. Success response
+    Form->>User: 10. Show success toast
+    SES->>Recipient: 11. Deliver formatted HTML email
