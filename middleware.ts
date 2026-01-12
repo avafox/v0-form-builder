@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
-import { getToken } from "next-auth/jwt"
 
 // Optional: Define allowed IP ranges for Sky UK offices
 const ALLOWED_IP_RANGES = process.env.ALLOWED_IP_RANGES?.split(",").map((ip) => ip.trim()) || []
@@ -58,30 +57,8 @@ export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname
 
   // Allow public routes (auth pages, API routes, static assets)
-  const publicPaths = ["/auth/signin", "/auth/error", "/api/auth", "/_next", "/favicon.ico"]
+  const publicPaths = ["/auth/signin", "/auth/error", "/api/auth", "/_next", "/favicon.ico", "/"]
   const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
-
-  if (!isPublicPath) {
-    // Check for valid NextAuth session
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-    })
-
-    // If no token, redirect to sign in
-    if (!token) {
-      const signInUrl = new URL("/auth/signin", request.url)
-      signInUrl.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(signInUrl)
-    }
-
-    // Validate email domain
-    const email = token.email as string
-    if (!email || !email.toLowerCase().endsWith("@sky.uk")) {
-      const errorUrl = new URL("/auth/error?error=AccessDenied", request.url)
-      return NextResponse.redirect(errorUrl)
-    }
-  }
 
   const response = NextResponse.next()
 
@@ -90,7 +67,14 @@ export async function middleware(request: NextRequest) {
   response.headers.set("X-Frame-Options", "DENY")
   response.headers.set("X-XSS-Protection", "1; mode=block")
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()")
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+
+  // Block suspicious paths
+  const blockedPatterns = ["/wp-admin", "/wp-login", "/.env", "/phpinfo", "/admin.php", "/.git"]
+  if (blockedPatterns.some((pattern) => pathname.toLowerCase().includes(pattern))) {
+    console.warn(`[Security] Blocked suspicious request: ${pathname} from ${clientIP}`)
+    return new NextResponse("Not Found", { status: 404 })
+  }
 
   // IP restriction check (optional)
   if (IP_RESTRICTION_ENABLED && ALLOWED_IP_RANGES.length > 0) {
@@ -98,13 +82,6 @@ export async function middleware(request: NextRequest) {
       console.warn(`[Security] Blocked request from unauthorized IP: ${clientIP}`)
       return new NextResponse("Access Denied", { status: 403 })
     }
-  }
-
-  // Block suspicious paths
-  const blockedPatterns = ["/wp-admin", "/wp-login", "/.env", "/phpinfo", "/admin.php", "/.git"]
-  if (blockedPatterns.some((pattern) => pathname.toLowerCase().includes(pattern))) {
-    console.warn(`[Security] Blocked suspicious request: ${pathname} from ${clientIP}`)
-    return new NextResponse("Not Found", { status: 404 })
   }
 
   return response

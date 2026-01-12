@@ -3,4 +3,7 @@ import { authOptions } from "./auth-options"
 
 const handler = NextAuth(authOptions)
 
+export const runtime = "nodejs"
+export const dynamic = "force-dynamic"
+
 export { handler as GET, handler as POST }

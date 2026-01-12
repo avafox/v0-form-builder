@@ -1,12 +1,30 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
+const clientId = process.env.MICROSOFT_CLIENT_ID
+const clientSecret = process.env.MICROSOFT_CLIENT_SECRET
+const tenantId = process.env.MICROSOFT_TENANT_ID
+const nextAuthSecret = process.env.NEXTAUTH_SECRET
+
+if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
+  console.error("[Auth] Missing required environment variables:", {
+    hasClientId: !!clientId,
+    hasClientSecret: !!clientSecret,
+    hasTenantId: !!tenantId,
+    hasSecret: !!nextAuthSecret,
+  })
+  throw new Error(
+    "NextAuth configuration error: Missing required environment variables. " +
+      "Please ensure MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_TENANT_ID, and NEXTAUTH_SECRET are set in Amplify.",
+  )
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID || "",
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
-      tenantId: process.env.MICROSOFT_TENANT_ID || "",
+      clientId,
+      clientSecret,
+      tenantId,
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -63,6 +81,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  secret: nextAuthSecret,
+  debug: process.env.NODE_ENV === "development",
 }

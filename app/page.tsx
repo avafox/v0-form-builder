@@ -1,19 +1,9 @@
-import { getServerSession } from "next-auth"
-import { redirect } from "next/navigation"
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Sparkles, Zap, FileCheck } from "lucide-react"
 
-export default async function HomePage() {
-  const session = await getServerSession(authOptions)
-
-  if (session?.user?.email) {
-    redirect("/communications")
-  }
-  // </CHANGE>
-
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -36,7 +26,6 @@ export default async function HomePage() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          {/* </CHANGE> */}
         </div>
       </section>
 
@@ -106,7 +95,6 @@ export default async function HomePage() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
-          {/* </CHANGE> */}
         </div>
       </section>
 
