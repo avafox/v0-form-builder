@@ -1,29 +1,16 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-if (!process.env.MICROSOFT_CLIENT_ID) {
-  console.error("[Auth] Missing MICROSOFT_CLIENT_ID environment variable")
-}
-if (!process.env.MICROSOFT_CLIENT_SECRET) {
-  console.error("[Auth] Missing MICROSOFT_CLIENT_SECRET environment variable")
-}
-if (!process.env.MICROSOFT_TENANT_ID) {
-  console.error("[Auth] Missing MICROSOFT_TENANT_ID environment variable")
-}
-if (!process.env.NEXTAUTH_SECRET) {
-  console.error("[Auth] Missing NEXTAUTH_SECRET environment variable")
-}
-
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID || "",
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
-      tenantId: process.env.MICROSOFT_TENANT_ID || "",
+      clientId: process.env.MICROSOFT_CLIENT_ID!,
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
+      tenantId: process.env.MICROSOFT_TENANT_ID!,
       authorization: {
         params: {
           scope: "openid profile email User.Read",
-          prompt: "login",
+          prompt: "select_account", // Changed from "login" to "select_account" for better UX
         },
       },
     }),
@@ -59,7 +46,6 @@ export const authOptions: AuthOptions = {
         return false
       }
 
-      // Only allow @sky.uk domain
       if (!email.endsWith("@sky.uk")) {
         console.warn(`[Auth] Sign in blocked - unauthorized domain: ${email}`)
         return false
@@ -73,8 +59,10 @@ export const authOptions: AuthOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  secret:
-    process.env.NEXTAUTH_SECRET ||
-    (process.env.NODE_ENV === "development" ? "dev-secret-change-in-production" : undefined),
-  debug: true, // Enable debug for troubleshooting
+  session: {
+    strategy: "jwt", // Explicitly set JWT strategy
+    maxAge: 8 * 60 * 60, // 8 hour sessions
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development", // Only debug in dev
 }

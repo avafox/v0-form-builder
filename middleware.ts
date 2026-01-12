@@ -66,7 +66,10 @@ export async function middleware(request: NextRequest) {
 
   if (!isPublicPath) {
     // Check for valid session token
-    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    })
 
     if (!token) {
       // No valid session - redirect to sign in
@@ -75,7 +78,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
 
-    // Validate email domain
+    // Validate email domain (Azure MFA is enforced during login)
     const email = token.email as string | undefined
     if (!email || !email.endsWith("@sky.uk")) {
       console.warn(`[Security] Blocked unauthorized email domain: ${email}`)
