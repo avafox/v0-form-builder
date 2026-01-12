@@ -1,5 +1,5 @@
 import type React from "react"
-import { SessionProvider } from "next-auth/react"
+import { SessionProviderWrapper } from "@/components/auth/session-provider-wrapper"
 import "./globals.css"
 
 export default function RootLayout({
@@ -10,7 +10,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProviderWrapper>{children}</SessionProviderWrapper>
       </body>
     </html>
   )
