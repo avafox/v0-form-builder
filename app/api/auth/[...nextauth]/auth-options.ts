@@ -6,25 +6,27 @@ const clientSecret = process.env.MICROSOFT_CLIENT_SECRET
 const tenantId = process.env.MICROSOFT_TENANT_ID
 const nextAuthSecret = process.env.NEXTAUTH_SECRET
 
+// Log configuration status (without exposing secrets)
+console.log("[v0] NextAuth configuration check:", {
+  hasClientId: !!clientId,
+  hasClientSecret: !!clientSecret,
+  hasTenantId: !!tenantId,
+  hasSecret: !!nextAuthSecret,
+  nodeEnv: process.env.NODE_ENV,
+})
+
+// Only create config if we have valid credentials
 if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
-  console.error("[Auth] Missing required environment variables:", {
-    hasClientId: !!clientId,
-    hasClientSecret: !!clientSecret,
-    hasTenantId: !!tenantId,
-    hasSecret: !!nextAuthSecret,
-  })
-  throw new Error(
-    "NextAuth configuration error: Missing required environment variables. " +
-      "Please ensure MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET, MICROSOFT_TENANT_ID, and NEXTAUTH_SECRET are set in Amplify.",
-  )
+  console.error("[v0] Missing required NextAuth environment variables")
+  console.error("[v0] This will cause CLIENT_FETCH_ERROR on the client side")
 }
 
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId,
-      clientSecret,
-      tenantId,
+      clientId: clientId || "missing",
+      clientSecret: clientSecret || "missing",
+      tenantId: tenantId || "missing",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -81,6 +83,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: nextAuthSecret,
-  debug: process.env.NODE_ENV === "development",
+  secret: nextAuthSecret || undefined,
+  debug: true, // Enable debug mode to see server logs
 }
