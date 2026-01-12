@@ -6,15 +6,6 @@ const clientSecret = process.env.MICROSOFT_CLIENT_SECRET
 const tenantId = process.env.MICROSOFT_TENANT_ID
 const nextAuthSecret = process.env.NEXTAUTH_SECRET
 
-// Log configuration status (without exposing secrets)
-console.log("[v0] NextAuth configuration check:", {
-  hasClientId: !!clientId,
-  hasClientSecret: !!clientSecret,
-  hasTenantId: !!tenantId,
-  hasSecret: !!nextAuthSecret,
-  nodeEnv: process.env.NODE_ENV,
-})
-
 // Only create config if we have valid credentials
 if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
   console.error("[v0] Missing required NextAuth environment variables")
@@ -24,9 +15,9 @@ if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: clientId || "missing",
-      clientSecret: clientSecret || "missing",
-      tenantId: tenantId || "missing",
+      clientId: clientId || "",
+      clientSecret: clientSecret || "",
+      tenantId: tenantId || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -62,16 +53,13 @@ export const authOptions: AuthOptions = {
       const email = user.email || (profile as any)?.email
 
       if (!email) {
-        console.error("[Auth] Sign in blocked - no email provided")
         return false
       }
 
       if (!email.toLowerCase().endsWith("@sky.uk")) {
-        console.error(`[Auth] Sign in blocked - unauthorized domain: ${email}`)
         return "/auth/error?error=AccessDenied"
       }
 
-      console.log(`[Auth] Sign in successful: ${email}`)
       return true
     },
   },
@@ -83,6 +71,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: nextAuthSecret || undefined,
-  debug: true, // Enable debug mode to see server logs
+  secret: nextAuthSecret,
+  debug: process.env.NODE_ENV === "development",
 }

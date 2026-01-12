@@ -1,22 +1,21 @@
-import { getServerSession } from "next-auth/next"
 import { redirect } from "next/navigation"
-import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options"
 import { CommunicationsTemplate } from "@/components/communications-template"
+import { requireAuth } from "@/lib/auth-helpers"
 
 export const dynamic = "force-dynamic"
 
 export default async function CommunicationsPage() {
-  const session = await getServerSession(authOptions)
+  const authResult = await requireAuth()
 
-  // Redirect to sign in if not authenticated
-  if (!session?.user?.email) {
-    redirect("/auth/signin?callbackUrl=/communications")
+  if (!authResult.authenticated) {
+    if (authResult.reason === "no_session") {
+      redirect("/auth/signin?callbackUrl=/communications")
+    } else if (authResult.reason === "invalid_domain") {
+      redirect("/auth/error?error=AccessDenied")
+    }
   }
 
-  // Validate Sky UK email domain
-  if (!session.user.email.toLowerCase().endsWith("@sky.uk")) {
-    redirect("/auth/error?error=AccessDenied")
-  }
+  const session = authResult.session!
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-purple-500 to-blue-600">
