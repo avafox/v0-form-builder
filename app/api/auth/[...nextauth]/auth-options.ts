@@ -1,23 +1,13 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-const clientId = process.env.MICROSOFT_CLIENT_ID
-const clientSecret = process.env.MICROSOFT_CLIENT_SECRET
-const tenantId = process.env.MICROSOFT_TENANT_ID
-const nextAuthSecret = process.env.NEXTAUTH_SECRET
-
-// Only create config if we have valid credentials
-if (!clientId || !clientSecret || !tenantId || !nextAuthSecret) {
-  console.error("[v0] Missing required NextAuth environment variables")
-  console.error("[v0] This will cause CLIENT_FETCH_ERROR on the client side")
-}
-
+// Environment variables are loaded at runtime by Amplify, not at build time
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: clientId || "",
-      clientSecret: clientSecret || "",
-      tenantId: tenantId || "",
+      clientId: process.env.MICROSOFT_CLIENT_ID || "",
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: process.env.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -56,6 +46,7 @@ export const authOptions: AuthOptions = {
         return false
       }
 
+      // Only allow @sky.uk email addresses
       if (!email.toLowerCase().endsWith("@sky.uk")) {
         return "/auth/error?error=AccessDenied"
       }
@@ -71,6 +62,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: nextAuthSecret,
-  debug: process.env.NODE_ENV === "development",
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: false, // Disabled debug mode to prevent build-time logging
 }
