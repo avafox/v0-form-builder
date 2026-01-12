@@ -1,6 +1,22 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
+const requiredEnvVars = {
+  MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
+  MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
+  MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
+  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+}
+
+const missingVars = Object.entries(requiredEnvVars)
+  .filter(([_, value]) => !value)
+  .map(([key]) => key)
+
+if (missingVars.length > 0) {
+  throw new Error(`Missing required environment variables for Azure AD authentication: ${missingVars.join(", ")}`)
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
@@ -10,7 +26,8 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: "openid profile email User.Read",
-          prompt: "select_account", // Changed from "login" to "select_account" for better UX
+          // prompt: "login" forces re-authentication and triggers MFA
+          prompt: "login",
         },
       },
     }),
@@ -42,13 +59,13 @@ export const authOptions: AuthOptions = {
       const email = user.email || (profile as any)?.email
 
       if (!email) {
-        console.warn("[Auth] Sign in blocked - no email provided")
+        console.error("[Auth] Sign in blocked - no email provided")
         return false
       }
 
-      if (!email.endsWith("@sky.uk")) {
-        console.warn(`[Auth] Sign in blocked - unauthorized domain: ${email}`)
-        return false
+      if (!email.toLowerCase().endsWith("@sky.uk")) {
+        console.error(`[Auth] Sign in blocked - unauthorized domain: ${email}`)
+        return "/auth/error?error=AccessDenied"
       }
 
       console.log(`[Auth] Sign in successful: ${email}`)
@@ -60,9 +77,9 @@ export const authOptions: AuthOptions = {
     error: "/auth/error",
   },
   session: {
-    strategy: "jwt", // Explicitly set JWT strategy
-    maxAge: 8 * 60 * 60, // 8 hour sessions
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development", // Only debug in dev
+  debug: false, // Disabled debug to reduce console noise
 }
