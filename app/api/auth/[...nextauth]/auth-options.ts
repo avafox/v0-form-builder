@@ -1,17 +1,29 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
+if (!process.env.MICROSOFT_CLIENT_ID) {
+  console.error("[Auth] Missing MICROSOFT_CLIENT_ID environment variable")
+}
+if (!process.env.MICROSOFT_CLIENT_SECRET) {
+  console.error("[Auth] Missing MICROSOFT_CLIENT_SECRET environment variable")
+}
+if (!process.env.MICROSOFT_TENANT_ID) {
+  console.error("[Auth] Missing MICROSOFT_TENANT_ID environment variable")
+}
+if (!process.env.NEXTAUTH_SECRET) {
+  console.error("[Auth] Missing NEXTAUTH_SECRET environment variable")
+}
+
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
+      clientId: process.env.MICROSOFT_CLIENT_ID || "",
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: process.env.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
-          prompt: "login", // Forces re-authentication every time
-          // acr_values: "urn:microsoft:req1", // Uncomment to require MFA explicitly
+          prompt: "login",
         },
       },
     }),
@@ -61,6 +73,8 @@ export const authOptions: AuthOptions = {
     signIn: "/auth/signin",
     error: "/auth/error",
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === "development",
+  secret:
+    process.env.NEXTAUTH_SECRET ||
+    (process.env.NODE_ENV === "development" ? "dev-secret-change-in-production" : undefined),
+  debug: true, // Enable debug for troubleshooting
 }

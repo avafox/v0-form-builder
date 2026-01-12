@@ -9,6 +9,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // NextAuth automatically reads these from process.env on the server side
   env: {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
@@ -19,11 +20,8 @@ const nextConfig = {
     SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY,
     SES_FROM_EMAIL: process.env.SES_FROM_EMAIL,
     SES_FROM_NAME: process.env.SES_FROM_NAME,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
-    MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
-    MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
+    // NEXTAUTH_URL and NEXTAUTH_SECRET are server-side only - don't expose to client
+    // MICROSOFT credentials are server-side only - don't expose to client
   },
 }
 
