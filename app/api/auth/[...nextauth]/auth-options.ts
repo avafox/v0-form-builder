@@ -10,7 +10,8 @@ export const authOptions: AuthOptions = {
       authorization: {
         params: {
           scope: "openid profile email User.Read",
-          prompt: "select_account",
+          prompt: "login", // Forces re-authentication every time
+          // acr_values: "urn:microsoft:req1", // Uncomment to require MFA explicitly
         },
       },
     }),
@@ -37,6 +38,23 @@ export const authOptions: AuthOptions = {
         session.user.name = token.name as string
       }
       return session
+    },
+    async signIn({ user, account, profile }) {
+      const email = user.email || (profile as any)?.email
+
+      if (!email) {
+        console.warn("[Auth] Sign in blocked - no email provided")
+        return false
+      }
+
+      // Only allow @sky.uk domain
+      if (!email.endsWith("@sky.uk")) {
+        console.warn(`[Auth] Sign in blocked - unauthorized domain: ${email}`)
+        return false
+      }
+
+      console.log(`[Auth] Sign in successful: ${email}`)
+      return true
     },
   },
   pages: {

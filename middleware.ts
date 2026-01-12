@@ -1,12 +1,9 @@
-import type { NextRequest } from "next/server"
 import { NextResponse } from "next/server"
+import type { NextRequest } from "next/server"
+import { getToken } from "next-auth/jwt"
 
 // Optional: Define allowed IP ranges for Sky UK offices
-// Set ALLOWED_IP_RANGES in environment variables (comma-separated)
-// Example: "10.0.0.0/8,192.168.1.0/24,203.0.113.50"
 const ALLOWED_IP_RANGES = process.env.ALLOWED_IP_RANGES?.split(",").map((ip) => ip.trim()) || []
-
-// Check if IP restriction is enabled
 const IP_RESTRICTION_ENABLED = process.env.ENABLE_IP_RESTRICTION === "true"
 
 // Helper to get client IP
@@ -20,18 +17,16 @@ function getClientIP(request: NextRequest): string {
 
 // Simple IP range check (supports exact IP or CIDR notation)
 function isIPAllowed(clientIP: string, allowedRanges: string[]): boolean {
-  if (allowedRanges.length === 0) return true // No restrictions if empty
+  if (allowedRanges.length === 0) return true
 
   for (const range of allowedRanges) {
     if (range.includes("/")) {
-      // CIDR notation - simplified check
       const [network, bits] = range.split("/")
       const mask = Number.parseInt(bits, 10)
       if (ipMatchesCIDR(clientIP, network, mask)) {
         return true
       }
     } else {
-      // Exact IP match
       if (clientIP === range) {
         return true
       }
@@ -62,6 +57,36 @@ export async function middleware(request: NextRequest) {
   const clientIP = getClientIP(request)
   const pathname = request.nextUrl.pathname
 
+  // Check if route requires authentication
+  const isPublicPath =
+    pathname === "/" ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api/auth")
+
+  if (!isPublicPath) {
+    // Check for valid session token
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+
+    if (!token) {
+      // No valid session - redirect to sign in
+      const url = new URL("/auth/signin", request.url)
+      url.searchParams.set("callbackUrl", pathname)
+      return NextResponse.redirect(url)
+    }
+
+    // Validate email domain
+    const email = token.email as string | undefined
+    if (!email || !email.endsWith("@sky.uk")) {
+      console.warn(`[Security] Blocked unauthorized email domain: ${email}`)
+      const url = new URL("/auth/error", request.url)
+      url.searchParams.set("error", "AccessDenied")
+      return NextResponse.redirect(url)
+    }
+
+    console.log(`[Auth] Authenticated request: ${email} → ${pathname}`)
+  }
+
   const response = NextResponse.next()
 
   // Security headers
@@ -71,6 +96,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()")
 
+  // IP restriction check
   if (IP_RESTRICTION_ENABLED && ALLOWED_IP_RANGES.length > 0) {
     if (!isIPAllowed(clientIP, ALLOWED_IP_RANGES)) {
       console.warn(`[Security] Blocked request from unauthorized IP: ${clientIP}`)
@@ -78,6 +104,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Block suspicious paths
   const blockedPatterns = ["/wp-admin", "/wp-login", "/.env", "/phpinfo", "/admin.php", "/.git", "/config.php"]
 
   if (blockedPatterns.some((pattern) => pathname.toLowerCase().includes(pattern))) {
