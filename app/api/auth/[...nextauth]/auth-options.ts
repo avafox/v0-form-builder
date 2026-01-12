@@ -1,33 +1,16 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 
-const requiredEnvVars = {
-  MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
-  MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
-  MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-}
-
-const missingVars = Object.entries(requiredEnvVars)
-  .filter(([_, value]) => !value)
-  .map(([key]) => key)
-
-if (missingVars.length > 0) {
-  throw new Error(`Missing required environment variables for Azure AD authentication: ${missingVars.join(", ")}`)
-}
-
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
+      clientId: process.env.MICROSOFT_CLIENT_ID || "",
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: process.env.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
-          // prompt: "login" forces re-authentication and triggers MFA
-          prompt: "login",
+          prompt: "login", // Forces re-authentication and triggers MFA
         },
       },
     }),
@@ -81,5 +64,5 @@ export const authOptions: AuthOptions = {
     maxAge: 8 * 60 * 60, // 8 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false, // Disabled debug to reduce console noise
+  debug: false,
 }

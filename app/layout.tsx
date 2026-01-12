@@ -1,6 +1,6 @@
 import type React from "react"
+import { SessionProvider } from "next-auth/react"
 import "./globals.css"
-import { AuthProvider } from "@/components/auth/auth-provider"
 
 export default function RootLayout({
   children,
@@ -10,12 +10,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   )
 }
 
 export const metadata = {
+  title: "GPE Communications Builder",
+  description: "Create and send professional communications for Sky UK",
   generator: "v0.app",
 }

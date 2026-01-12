@@ -57,37 +57,30 @@ export async function middleware(request: NextRequest) {
   const clientIP = getClientIP(request)
   const pathname = request.nextUrl.pathname
 
-  // Check if route requires authentication
-  const isPublicPath =
-    pathname === "/" ||
-    pathname.startsWith("/auth/") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/api/auth")
+  // Allow public routes (auth pages, API routes, static assets)
+  const publicPaths = ["/auth/signin", "/auth/error", "/api/auth", "/_next", "/favicon.ico"]
+  const isPublicPath = publicPaths.some((path) => pathname.startsWith(path))
 
   if (!isPublicPath) {
-    // Check for valid session token
+    // Check for valid NextAuth session
     const token = await getToken({
       req: request,
       secret: process.env.NEXTAUTH_SECRET,
     })
 
+    // If no token, redirect to sign in
     if (!token) {
-      // No valid session - redirect to sign in
-      const url = new URL("/auth/signin", request.url)
-      url.searchParams.set("callbackUrl", pathname)
-      return NextResponse.redirect(url)
+      const signInUrl = new URL("/auth/signin", request.url)
+      signInUrl.searchParams.set("callbackUrl", pathname)
+      return NextResponse.redirect(signInUrl)
     }
 
-    // Validate email domain (Azure MFA is enforced during login)
-    const email = token.email as string | undefined
-    if (!email || !email.endsWith("@sky.uk")) {
-      console.warn(`[Security] Blocked unauthorized email domain: ${email}`)
-      const url = new URL("/auth/error", request.url)
-      url.searchParams.set("error", "AccessDenied")
-      return NextResponse.redirect(url)
+    // Validate email domain
+    const email = token.email as string
+    if (!email || !email.toLowerCase().endsWith("@sky.uk")) {
+      const errorUrl = new URL("/auth/error?error=AccessDenied", request.url)
+      return NextResponse.redirect(errorUrl)
     }
-
-    console.log(`[Auth] Authenticated request: ${email} → ${pathname}`)
   }
 
   const response = NextResponse.next()
@@ -99,7 +92,7 @@ export async function middleware(request: NextRequest) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
   response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()")
 
-  // IP restriction check
+  // IP restriction check (optional)
   if (IP_RESTRICTION_ENABLED && ALLOWED_IP_RANGES.length > 0) {
     if (!isIPAllowed(clientIP, ALLOWED_IP_RANGES)) {
       console.warn(`[Security] Blocked request from unauthorized IP: ${clientIP}`)
@@ -108,8 +101,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Block suspicious paths
-  const blockedPatterns = ["/wp-admin", "/wp-login", "/.env", "/phpinfo", "/admin.php", "/.git", "/config.php"]
-
+  const blockedPatterns = ["/wp-admin", "/wp-login", "/.env", "/phpinfo", "/admin.php", "/.git"]
   if (blockedPatterns.some((pattern) => pathname.toLowerCase().includes(pattern))) {
     console.warn(`[Security] Blocked suspicious request: ${pathname} from ${clientIP}`)
     return new NextResponse("Not Found", { status: 404 })

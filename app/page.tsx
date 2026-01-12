@@ -1,12 +1,18 @@
-"use client"
-
+import { getServerSession } from "next-auth"
+import { redirect } from "next/navigation"
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, Mail, Sparkles, Zap, FileCheck } from "lucide-react"
 
-export default function HomePage() {
-  // const { data: session } = useSession()
+export default async function HomePage() {
+  const session = await getServerSession(authOptions)
+
+  if (session?.user?.email) {
+    redirect("/communications")
+  }
+  // </CHANGE>
 
   return (
     <div className="min-h-screen bg-white">
@@ -24,12 +30,13 @@ export default function HomePage() {
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
             Create professional, branded email communications in minutes
           </p>
-          <Link href="/communications">
+          <Link href="/auth/signin">
             <Button size="lg" className="bg-white text-gray-900 hover:bg-gray-100 text-lg px-8 py-6 h-auto">
-              Start Creating
+              Sign In to Start
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
+          {/* </CHANGE> */}
         </div>
       </section>
 
@@ -69,7 +76,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Feature 4 - New GPE Change Control */}
+            {/* Feature 4 */}
             <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
                 <FileCheck className="h-6 w-6 text-green-600" />
@@ -88,17 +95,18 @@ export default function HomePage() {
         <div className="container mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Get Started?</h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Create your first communication now and see how easy it is
+            Sign in with your Sky account to create your first communication
           </p>
-          <Link href="/communications">
+          <Link href="/auth/signin">
             <Button
               size="lg"
               className="bg-gradient-to-r from-orange-500 via-purple-500 to-blue-600 text-white hover:opacity-90 text-lg px-8 py-6 h-auto"
             >
-              Launch Communications Builder
+              Sign In with Microsoft
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>
+          {/* </CHANGE> */}
         </div>
       </section>
 
