@@ -23,11 +23,13 @@ frontend:
         - echo "RESEND_API_KEY=$RESEND_API_KEY" >> .env.production
         - echo "RESEND_FROM_EMAIL=$RESEND_FROM_EMAIL" >> .env.production
         - echo "RESEND_FROM_NAME=$RESEND_FROM_NAME" >> .env.production
+        - cat .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
     files:
       - '**/*'
+      - '.env.production'
   cache:
     paths:
       - node_modules/**/*
