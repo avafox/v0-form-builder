@@ -7,17 +7,24 @@ frontend:
         - nvm use 20
         - node --version
         - npm install --legacy-peer-deps
-        # Export environment variables so they're available at runtime
-        - export NEXTAUTH_SECRET="${NEXTAUTH_SECRET}"
-        - export NEXTAUTH_URL="${NEXTAUTH_URL}"
-        - export MICROSOFT_CLIENT_ID="${MICROSOFT_CLIENT_ID}"
-        - export MICROSOFT_CLIENT_SECRET="${MICROSOFT_CLIENT_SECRET}"
-        - export MICROSOFT_TENANT_ID="${MICROSOFT_TENANT_ID}"
-        - export SES_ACCESS_KEY_ID="${SES_ACCESS_KEY_ID}"
-        - export SES_SECRET_ACCESS_KEY="${SES_SECRET_ACCESS_KEY}"
-        - export SES_REGION="${SES_REGION}"
-        - export SES_FROM_EMAIL="${SES_FROM_EMAIL}"
-        - export SES_FROM_NAME="${SES_FROM_NAME}"
+        - |
+          cat > lib/runtime-config.ts << 'EOF'
+          // Auto-generated at build time by Amplify
+          export const runtimeConfig = {
+            NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET || "${NEXTAUTH_SECRET}",
+            NEXTAUTH_URL: process.env.NEXTAUTH_URL || "${NEXTAUTH_URL}",
+            MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID || "${MICROSOFT_CLIENT_ID}",
+            MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET || "${MICROSOFT_CLIENT_SECRET}",
+            MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID || "${MICROSOFT_TENANT_ID}",
+          };
+          EOF
+        - sed -i "s|\${NEXTAUTH_SECRET}|$NEXTAUTH_SECRET|g" lib/runtime-config.ts
+        - sed -i "s|\${NEXTAUTH_URL}|$NEXTAUTH_URL|g" lib/runtime-config.ts
+        - sed -i "s|\${MICROSOFT_CLIENT_ID}|$MICROSOFT_CLIENT_ID|g" lib/runtime-config.ts
+        - sed -i "s|\${MICROSOFT_CLIENT_SECRET}|$MICROSOFT_CLIENT_SECRET|g" lib/runtime-config.ts
+        - sed -i "s|\${MICROSOFT_TENANT_ID}|$MICROSOFT_TENANT_ID|g" lib/runtime-config.ts
+        - echo "Generated runtime config:"
+        - cat lib/runtime-config.ts
     build:
       commands:
         - npm run build

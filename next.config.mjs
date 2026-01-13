@@ -8,15 +8,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Force server-side environment variables to be available in Lambda runtime
-  serverRuntimeConfig: {
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
-    MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
-    MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
-  },
   env: {
+    // NextAuth configuration
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     // Email configuration (server-side)
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
@@ -28,7 +22,6 @@ const nextConfig = {
     SES_FROM_EMAIL: process.env.SES_FROM_EMAIL,
     SES_FROM_NAME: process.env.SES_FROM_NAME,
   },
-  // Ensure environment variables are available in production builds
   experimental: {
     outputStandalone: false,
   },

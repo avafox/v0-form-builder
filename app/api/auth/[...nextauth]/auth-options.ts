@@ -1,13 +1,14 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
 import { checkUserAccess } from "@/lib/access-control"
+import { runtimeConfig } from "@/lib/runtime-config"
 
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID || "",
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
-      tenantId: process.env.MICROSOFT_TENANT_ID || "",
+      clientId: runtimeConfig.MICROSOFT_CLIENT_ID || "",
+      clientSecret: runtimeConfig.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: runtimeConfig.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",
@@ -67,6 +68,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: process.env.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
-  debug: process.env.NODE_ENV === "development",
+  secret: runtimeConfig.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
+  debug: false,
 }
