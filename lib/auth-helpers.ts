@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options"
+import { checkUserAccess } from "./access-control"
 
 export async function getAuthSession() {
   return await getServerSession(authOptions)
@@ -12,7 +13,7 @@ export async function requireAuth() {
     return { authenticated: false, reason: "no_session" }
   }
 
-  if (!session.user.email.toLowerCase().endsWith("@sky.uk")) {
+  if (!checkUserAccess(session.user.email)) {
     return { authenticated: false, reason: "invalid_domain" }
   }
 

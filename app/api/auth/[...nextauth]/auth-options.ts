@@ -3,7 +3,6 @@ import AzureADProvider from "next-auth/providers/azure-ad"
 import { checkUserAccess } from "@/lib/access-control"
 import crypto from "crypto"
 
-// Generate a consistent secret for the session if NEXTAUTH_SECRET is not provided
 function getOrGenerateSecret(): string {
   if (process.env.NEXTAUTH_SECRET) {
     return process.env.NEXTAUTH_SECRET
@@ -84,5 +83,5 @@ export const authOptions: AuthOptions = {
     maxAge: 8 * 60 * 60,
   },
   secret: getOrGenerateSecret(),
-  debug: true,
+  debug: false,
 }

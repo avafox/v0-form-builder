@@ -1,19 +1,21 @@
 // Access control configuration for email-based permissions
 
-// Allowed email domains (e.g., only @sky.uk users)
+// Allowed email domains - users with these domains can sign in
 export const ALLOWED_DOMAINS = [
-  "sky.uk",
-  "3dflyingmonsters.co.uk", // Added test domain for Azure test user
+  "sky.uk", // Primary Sky UK employees
+  "3dflyingmonsters.co.uk", // Test domain for Azure test users
   // Add more domains here as needed:
   // "partner-company.com",
 ]
 
 // Specific email addresses that are always allowed (whitelist)
+// Use this to grant access to specific individuals from non-allowed domains
 export const ALLOWED_EMAILS = [
   "ava.foxwell@sky.uk",
-  // Add more specific emails here as needed:
+  // Add specific emails here as needed:
   // "john.doe@sky.uk",
   // "jane.smith@sky.uk",
+  // "contractor@external.com",
 ]
 
 // Check if user has access based on their email
