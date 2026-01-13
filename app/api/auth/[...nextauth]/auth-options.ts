@@ -1,5 +1,6 @@
 import type { AuthOptions } from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad"
+import { checkUserAccess } from "@/lib/access-control"
 
 // Environment variables are loaded at runtime by Amplify, not at build time
 export const authOptions: AuthOptions = {
@@ -55,17 +56,12 @@ export const authOptions: AuthOptions = {
         return "/auth/error?error=AccessDenied"
       }
 
-      // Normalize email to lowercase for comparison
-      const normalizedEmail = email.toLowerCase().trim()
-      console.log("[v0] Normalized email:", normalizedEmail)
-
-      // Only allow @sky.uk email addresses
-      if (!normalizedEmail.endsWith("@sky.uk")) {
-        console.error("[v0] Email domain not allowed:", normalizedEmail)
+      if (!checkUserAccess(email)) {
+        console.error("[v0] Access denied for email:", email)
         return "/auth/error?error=AccessDenied"
       }
 
-      console.log("[v0] Email validation passed for:", normalizedEmail)
+      console.log("[v0] Email validation passed for:", email)
       return true
     },
   },

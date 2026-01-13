@@ -3,6 +3,7 @@
 // Allowed email domains (e.g., only @sky.uk users)
 export const ALLOWED_DOMAINS = [
   "sky.uk",
+  "3dflyingmonsters.co.uk", // Added test domain for Azure test user
   // Add more domains here as needed:
   // "partner-company.com",
 ]
