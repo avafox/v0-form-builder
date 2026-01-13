@@ -25,6 +25,8 @@ export default function SignInPage() {
     signIn("azure-ad", { callbackUrl: "/communications" })
   }
 
+  // const canAuthenticate = configStatus?.canAuthenticate || false
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-400 via-purple-500 to-blue-600 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -37,21 +39,31 @@ export default function SignInPage() {
             <div className="text-center py-4">Loading configuration...</div>
           ) : (
             <>
-              <Button onClick={handleSignIn} className="w-full" size="lg" disabled={!configStatus?.hasNextAuthSecret}>
+              <Button onClick={handleSignIn} className="w-full" size="lg">
                 Sign in with Microsoft
               </Button>
 
-              {configStatus && !configStatus.hasNextAuthSecret && (
+              <p className="text-xs text-center text-muted-foreground">
+                Authorized for @sky.uk and @3dflyingmonsters.co.uk domains
+              </p>
+
+              {/* {configStatus && !canAuthenticate && (
                 <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
                   <strong>Configuration Error:</strong> NextAuth is not properly configured. Check Amplify environment
                   variables.
                 </div>
               )}
 
+              {configStatus?.usingFallbackSecret && (
+                <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                  Using generated secret (NEXTAUTH_SECRET not set in Amplify)
+                </div>
+              )}
+
               <details className="text-xs">
                 <summary className="cursor-pointer text-muted-foreground">Show configuration status</summary>
                 <pre className="mt-2 p-2 bg-muted rounded overflow-auto">{JSON.stringify(configStatus, null, 2)}</pre>
-              </details>
+              </details> */}
             </>
           )}
         </CardContent>
