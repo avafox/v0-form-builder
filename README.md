@@ -60,6 +60,25 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000)
 
+## Authentication
+
+**Azure AD MFA is now working and enforced for all users.**
+
+### Current Setup
+- Azure AD authentication via NextAuth.js
+- MFA enforced through `prompt: "login"` parameter
+- Authorized domains: @sky.uk (production) and @3dflyingmonsters.co.uk (testing)
+- Environment variables injected at build time via `lib/runtime-config.ts`
+
+### How to Sign In
+1. Visit `/auth/signin`
+2. Click "Sign in with Microsoft"
+3. Authenticate with your Microsoft account
+4. Complete MFA if prompted by your Azure AD policies
+5. Access the communications builder at `/communications`
+
+**See [docs/AZURE_MFA_FINAL_SETUP.md](./docs/AZURE_MFA_FINAL_SETUP.md) for detailed setup and troubleshooting.**
+
 ## Environment Variables
 
 **Critical variables for AWS Amplify:**
@@ -99,6 +118,7 @@ Comprehensive documentation is available in the `/docs` folder:
 - **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Deployment guide and troubleshooting
 - **[DEVELOPMENT.md](./docs/DEVELOPMENT.md)** - Local development setup and guidelines
 - **[COMMON-ISSUES.md](./docs/COMMON-ISSUES.md)** - Common problems and solutions
+- **[AZURE_MFA_FINAL_SETUP.md](./docs/AZURE_MFA_FINAL_SETUP.md)** - Detailed setup and troubleshooting for Azure AD MFA
 
 ## Architecture
 
