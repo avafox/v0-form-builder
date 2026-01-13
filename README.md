@@ -114,6 +114,7 @@ KV_REST_API_URL=<upstash-rest-url>
 
 Comprehensive documentation is available in the `/docs` folder:
 
+- **[NPM_SECURITY_BEST_PRACTICES.md](./docs/NPM_SECURITY_BEST_PRACTICES.md)** - 🔒 **CRITICAL** - Supply chain attack protection
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture and design decisions
 - **[DEPLOYMENT.md](./docs/DEPLOYMENT.md)** - Deployment guide and troubleshooting
 - **[DEVELOPMENT.md](./docs/DEVELOPMENT.md)** - Local development setup and guidelines
@@ -220,21 +221,41 @@ See [docs/COMMON-ISSUES.md](./docs/COMMON-ISSUES.md) for detailed troubleshootin
 
 ### Regular Tasks
 
-- **Weekly:** Review Amplify deployment logs
+- **Weekly:** Review Amplify deployment logs + run `npm run security-check`
 - **Monthly:** Check AWS SES sending statistics
-- **Quarterly:** Update npm dependencies
+- **Quarterly:** Update npm dependencies (check Snyk dashboard)
 - **Annually:** Rotate secrets and review IAM permissions
 
 See [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) for code standards and contribution guidelines.
 
 ## Security
 
+### Application Security
 - **Authentication:** Azure AD with Sky UK SSO
 - **Authorization:** Group-based access control
 - **Database:** Row Level Security (RLS) enabled on all tables
 - **Secrets:** Environment variables managed in Amplify Console
 - **Email:** AWS SES with least-privilege IAM policy
 - **Sessions:** Encrypted with NextAuth secret
+
+### NPM Supply Chain Security
+
+**Protection against npm supply chain attacks (Shai-Hulud 2.0):**
+
+- All dependencies use exact versions (no `^` or `~`)
+- `package-lock.json` committed to repository for reproducible builds
+- Automated `npm audit` runs on every Amplify build
+- Security check script available: `npm run security-check`
+
+**Security Commands:**
+```bash
+npm run audit           # Check for vulnerabilities
+npm run audit:fix       # Auto-fix vulnerabilities
+npm run security-check  # Full security audit + outdated packages
+bash scripts/security-check.sh  # Comprehensive weekly security check
+```
+
+**See [docs/NPM_SECURITY_BEST_PRACTICES.md](./docs/NPM_SECURITY_BEST_PRACTICES.md) for detailed security guidelines and incident response procedures.**
 
 ## Cost Estimate
 

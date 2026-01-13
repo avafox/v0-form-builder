@@ -11,6 +11,7 @@ This directory contains comprehensive documentation for the GPE Communications T
 - **[DEPLOYMENT.md](./DEPLOYMENT.md)** - General deployment instructions
 
 ### Authentication & Security
+- **[NPM_SECURITY_BEST_PRACTICES.md](./NPM_SECURITY_BEST_PRACTICES.md)** - ✅ **CRITICAL** - NPM supply chain attack protection
 - **[AUTHENTICATION.md](./AUTHENTICATION.md)** - Authentication architecture
 - **[ACCESS_CONTROL_SETUP.md](./ACCESS_CONTROL_SETUP.md)** - User access control configuration
 - **[SECURITY.md](./SECURITY.md)** - Security best practices

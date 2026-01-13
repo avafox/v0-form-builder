@@ -6,7 +6,8 @@ frontend:
         - nvm install 20
         - nvm use 20
         - node --version
-        - npm install --legacy-peer-deps
+        - npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+        - npm audit --audit-level=moderate || echo "⚠️ Security vulnerabilities detected - review required"
         - |
           cat > lib/runtime-config.ts << 'EOF'
           // Auto-generated at build time by Amplify
