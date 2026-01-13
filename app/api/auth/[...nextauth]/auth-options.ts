@@ -40,17 +40,32 @@ export const authOptions: AuthOptions = {
       return session
     },
     async signIn({ user, account, profile }) {
-      const email = user.email || (profile as any)?.email
+      console.log("[v0] SignIn callback triggered")
+      console.log("[v0] User:", JSON.stringify(user, null, 2))
+      console.log("[v0] Profile:", JSON.stringify(profile, null, 2))
+
+      // Try to get email from multiple sources
+      const email =
+        user.email || (profile as any)?.email || (profile as any)?.preferred_username || (profile as any)?.upn
+
+      console.log("[v0] Extracted email:", email)
 
       if (!email) {
-        return false
-      }
-
-      // Only allow @sky.uk email addresses
-      if (!email.toLowerCase().endsWith("@sky.uk")) {
+        console.error("[v0] No email found in user or profile")
         return "/auth/error?error=AccessDenied"
       }
 
+      // Normalize email to lowercase for comparison
+      const normalizedEmail = email.toLowerCase().trim()
+      console.log("[v0] Normalized email:", normalizedEmail)
+
+      // Only allow @sky.uk email addresses
+      if (!normalizedEmail.endsWith("@sky.uk")) {
+        console.error("[v0] Email domain not allowed:", normalizedEmail)
+        return "/auth/error?error=AccessDenied"
+      }
+
+      console.log("[v0] Email validation passed for:", normalizedEmail)
       return true
     },
   },
@@ -63,5 +78,5 @@ export const authOptions: AuthOptions = {
     maxAge: 8 * 60 * 60, // 8 hours
   },
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false, // Disabled debug mode to prevent build-time logging
+  debug: true, // Enabled debug mode to troubleshoot
 }
