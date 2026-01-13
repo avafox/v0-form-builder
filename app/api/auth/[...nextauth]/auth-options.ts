@@ -21,11 +21,6 @@ function getOrGenerateSecret(): string {
   return crypto.createHash("sha256").update(seed).digest("hex")
 }
 
-console.log("[v0] Initializing NextAuth with runtime env check")
-console.log("[v0] NEXTAUTH_SECRET exists:", !!process.env.NEXTAUTH_SECRET)
-console.log("[v0] NEXTAUTH_URL:", process.env.NEXTAUTH_URL)
-console.log("[v0] MICROSOFT_CLIENT_ID exists:", !!process.env.MICROSOFT_CLIENT_ID)
-
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
@@ -67,20 +62,13 @@ export const authOptions: AuthOptions = {
       const email =
         user.email || (profile as any)?.email || (profile as any)?.preferred_username || (profile as any)?.upn
 
-      console.log("[v0] SignIn callback - email:", email)
-      console.log("[v0] SignIn callback - user:", JSON.stringify(user))
-      console.log("[v0] SignIn callback - profile:", JSON.stringify(profile))
-
       if (!email) {
-        console.log("[v0] SignIn rejected: No email found")
         return "/auth/error?error=AccessDenied"
       }
 
       const hasAccess = checkUserAccess(email)
-      console.log("[v0] SignIn access check for", email, ":", hasAccess)
 
       if (!hasAccess) {
-        console.log("[v0] SignIn rejected: Domain not allowed")
         return "/auth/error?error=AccessDenied"
       }
 
@@ -96,7 +84,5 @@ export const authOptions: AuthOptions = {
     maxAge: 8 * 60 * 60,
   },
   secret: getOrGenerateSecret(),
-  debug: true, // Enable debug for troubleshooting
+  debug: true,
 }
-
-console.log("[v0] NextAuth initialized successfully")
