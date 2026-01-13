@@ -26,7 +26,6 @@ function validateEnvVars() {
       hasClientId: !!process.env.MICROSOFT_CLIENT_ID,
       clientIdPreview: process.env.MICROSOFT_CLIENT_ID?.substring(0, 8),
     })
-    throw new Error(`Missing required environment variables: ${missing.join(", ")}`)
   }
 
   console.log("[v0] All required environment variables are present")
@@ -34,18 +33,14 @@ function validateEnvVars() {
 }
 
 // Validate on module load
-try {
-  validateEnvVars()
-} catch (error) {
-  console.error("[v0] Environment validation failed:", error)
-}
+validateEnvVars()
 
 export const authOptions: AuthOptions = {
   providers: [
     AzureADProvider({
-      clientId: process.env.MICROSOFT_CLIENT_ID!,
-      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
-      tenantId: process.env.MICROSOFT_TENANT_ID!,
+      clientId: process.env.MICROSOFT_CLIENT_ID || "",
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET || "",
+      tenantId: process.env.MICROSOFT_TENANT_ID || "",
       authorization: {
         params: {
           scope: "openid profile email User.Read",

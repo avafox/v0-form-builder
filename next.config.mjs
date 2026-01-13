@@ -1,4 +1,3 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
@@ -9,8 +8,16 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // NextAuth automatically reads these from process.env on the server side
+  // Force server-side environment variables to be available in Lambda runtime
+  serverRuntimeConfig: {
+    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    MICROSOFT_CLIENT_ID: process.env.MICROSOFT_CLIENT_ID,
+    MICROSOFT_CLIENT_SECRET: process.env.MICROSOFT_CLIENT_SECRET,
+    MICROSOFT_TENANT_ID: process.env.MICROSOFT_TENANT_ID,
+  },
   env: {
+    // Email configuration (server-side)
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_FROM_EMAIL: process.env.RESEND_FROM_EMAIL,
     RESEND_FROM_NAME: process.env.RESEND_FROM_NAME,
@@ -20,8 +27,10 @@ const nextConfig = {
     SES_SECRET_ACCESS_KEY: process.env.SES_SECRET_ACCESS_KEY,
     SES_FROM_EMAIL: process.env.SES_FROM_EMAIL,
     SES_FROM_NAME: process.env.SES_FROM_NAME,
-    // NEXTAUTH_URL and NEXTAUTH_SECRET are server-side only - don't expose to client
-    // MICROSOFT credentials are server-side only - don't expose to client
+  },
+  // Ensure environment variables are available in production builds
+  experimental: {
+    outputStandalone: false,
   },
 }
 

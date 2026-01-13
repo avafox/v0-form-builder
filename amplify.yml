@@ -9,27 +9,11 @@ frontend:
         - npm install --legacy-peer-deps
     build:
       commands:
-        - echo "MICROSOFT_CLIENT_ID=$MICROSOFT_CLIENT_ID" >> .env.production
-        - echo "MICROSOFT_CLIENT_SECRET=$MICROSOFT_CLIENT_SECRET" >> .env.production
-        - echo "MICROSOFT_TENANT_ID=$MICROSOFT_TENANT_ID" >> .env.production
-        - echo "NEXTAUTH_SECRET=$NEXTAUTH_SECRET" >> .env.production
-        - echo "NEXTAUTH_URL=$NEXTAUTH_URL" >> .env.production
-        - echo "SES_REGION=$SES_REGION" >> .env.production
-        - echo "SES_ACCESS_KEY_ID=$SES_ACCESS_KEY_ID" >> .env.production
-        - echo "SES_SECRET_ACCESS_KEY=$SES_SECRET_ACCESS_KEY" >> .env.production
-        - echo "SES_FROM_EMAIL=$SES_FROM_EMAIL" >> .env.production
-        - echo "SES_FROM_NAME=$SES_FROM_NAME" >> .env.production
-        - echo "EMAIL_PROVIDER=$EMAIL_PROVIDER" >> .env.production
-        - echo "RESEND_API_KEY=$RESEND_API_KEY" >> .env.production
-        - echo "RESEND_FROM_EMAIL=$RESEND_FROM_EMAIL" >> .env.production
-        - echo "RESEND_FROM_NAME=$RESEND_FROM_NAME" >> .env.production
-        - cat .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
     files:
       - '**/*'
-      - '.env.production'
   cache:
     paths:
       - node_modules/**/*
