@@ -44,15 +44,18 @@ export const authOptions: AuthOptions = {
         user.email || (profile as any)?.email || (profile as any)?.preferred_username || (profile as any)?.upn
 
       if (!email) {
+        console.log("[v0] Sign-in failed: No email found in profile")
         return "/auth/error?error=AccessDenied"
       }
 
       const hasAccess = checkUserAccess(email)
 
       if (!hasAccess) {
+        console.log("[v0] Sign-in failed: Email not in allowed domains:", email)
         return "/auth/error?error=AccessDenied"
       }
 
+      console.log("[v0] Sign-in successful for:", email)
       return true
     },
   },
@@ -64,6 +67,6 @@ export const authOptions: AuthOptions = {
     strategy: "jwt",
     maxAge: 8 * 60 * 60, // 8 hours
   },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  secret: process.env.NEXTAUTH_SECRET || "development-secret-please-change-in-production",
+  debug: process.env.NODE_ENV === "development",
 }
