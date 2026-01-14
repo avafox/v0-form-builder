@@ -17,7 +17,7 @@ The environment variables weren't loading at runtime in AWS Amplify Lambda funct
 
 ## Verification Steps
 
-After deployment, visit: `https://main.d2baofxalff7ki.amplifyapp.com/api/debug/azure-check`
+After deployment, visit: `https://your-amplify-url.amplifyapp.com/api/debug/azure-check`
 
 You should see:
 ```json
@@ -34,7 +34,7 @@ You should see:
 
 ## Testing Authentication
 
-1. Visit: `https://main.d2baofxalff7ki.amplifyapp.com/auth/signin`
+1. Visit: `https://your-amplify-url.amplifyapp.com/auth/signin`
 2. Click "Sign in with Microsoft"
 3. You should be redirected to Azure AD login
 4. Complete MFA if prompted by your Azure AD policies
@@ -49,7 +49,7 @@ If authentication still fails:
    - Verify the file shows actual values, not empty strings
 
 2. **Verify Azure AD App Registration**:
-   - Redirect URI: `https://main.d2baofxalff7ki.amplifyapp.com/api/auth/callback/azure-ad`
+   - Redirect URI: `https://your-amplify-url.amplifyapp.com/api/auth/callback/azure-ad`
    - Admin consent granted (if required by tenant policy)
 
 3. **Check Environment Variables in Amplify Console**:
@@ -60,11 +60,11 @@ If authentication still fails:
 ## Environment Variables Required
 
 ```
-NEXTAUTH_SECRET=nu/zSvG++aGcp6d55JT/sAo4FPY4oLUKvkKHRxNWVPo=
-NEXTAUTH_URL=https://main.d2baofxalff7ki.amplifyapp.com
-MICROSOFT_CLIENT_ID=6a4e7950-9c5d-4ee7-b644-8d1f86235d8d
-MICROSOFT_CLIENT_SECRET=bqm8Q~j2ujv1HdXAx61vqKNp64XUrLtI3I91gbPI
-MICROSOFT_TENANT_ID=2fdb7e27-9b62-44f7-a0fe-9836eaa1f161
+NEXTAUTH_SECRET=<your-generated-32-char-secret>
+NEXTAUTH_URL=https://your-amplify-url.amplifyapp.com
+MICROSOFT_CLIENT_ID=<your-azure-app-client-id>
+MICROSOFT_CLIENT_SECRET=<your-azure-app-client-secret>
+MICROSOFT_TENANT_ID=<your-azure-tenant-id>
 ```
 
 ## Authorized Domains

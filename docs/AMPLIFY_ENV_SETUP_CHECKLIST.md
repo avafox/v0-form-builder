@@ -11,32 +11,32 @@ The amplify.yml now writes environment variables to `.env.production` during the
 Go to your Amplify app → **App settings** → **Environment variables** and ensure ALL of these are set:
 
 ### NextAuth Variables
-1. **NEXTAUTH_SECRET** = `nu/zSvG++aGcp6d55JT/sAo4FPY4oLUKvkKHRxNWVPo=`
-2. **NEXTAUTH_URL** = `https://main.d2baofxalff7ki.amplifyapp.com`
+1. **NEXTAUTH_SECRET** = `<your-generated-32-char-secret>`
+2. **NEXTAUTH_URL** = `https://your-amplify-url.amplifyapp.com`
 
 ### Azure AD Variables
-3. **MICROSOFT_CLIENT_ID** = `6a4e7950-9c5d-4ee7-b644-8d1f86235d8d`
-4. **MICROSOFT_CLIENT_SECRET** = `bqm8Q~j2ujv1HdXAx61vqKNp64XUrLtI3I91gbPI`
-5. **MICROSOFT_TENANT_ID** = `2fdb7e27-9b62-44f7-a0fe-9836eaa1f161`
+3. **MICROSOFT_CLIENT_ID** = `<your-azure-app-client-id>`
+4. **MICROSOFT_CLIENT_SECRET** = `<your-azure-app-client-secret>`
+5. **MICROSOFT_TENANT_ID** = `<your-azure-tenant-id>`
 
 ### AWS SES Variables
-6. **SES_ACCESS_KEY_ID** = `AKIAVUMJV46IQUPH2L5E`
-7. **SES_SECRET_ACCESS_KEY** = `AMWniWk+oZLqaW+sleWiE5aa4k2ArnbWvlHVVhCr`
+6. **SES_ACCESS_KEY_ID** = `<your-ses-access-key-id>`
+7. **SES_SECRET_ACCESS_KEY** = `<your-ses-secret-access-key>`
 8. **SES_REGION** = `eu-west-2`
-9. **SES_FROM_EMAIL** = `cti-gpe-communications@sky.uk`
-10. **SES_FROM_NAME** = `GPE Communications Team`
+9. **SES_FROM_EMAIL** = `your-email@yourdomain.com`
+10. **SES_FROM_NAME** = `Your Team Name`
 
 ## Verification Steps
 
 After deploying:
 
 1. **Check environment variables are loaded:**
-   - Visit: `https://main.d2baofxalff7ki.amplifyapp.com/api/debug/azure-check`
+   - Visit: `https://your-amplify-url.amplifyapp.com/api/debug/azure-check`
    - Should show `canAuthenticate: true`
    - All variables should show `true` instead of `false`
 
 2. **Test authentication flow:**
-   - Visit: `https://main.d2baofxalff7ki.amplifyapp.com/auth/signin`
+   - Visit: `https://your-amplify-url.amplifyapp.com/auth/signin`
    - Click "Sign in with Microsoft"
    - Should redirect to Microsoft login (not error page)
    - After MFA authentication, should redirect back to `/communications`
@@ -70,7 +70,7 @@ artifacts:
 
 Ensure your Azure AD App Registration has this redirect URI:
 ```
-https://main.d2baofxalff7ki.amplifyapp.com/api/auth/callback/azure-ad
+https://your-amplify-url.amplifyapp.com/api/auth/callback/azure-ad
 ```
 
 ## Admin Consent

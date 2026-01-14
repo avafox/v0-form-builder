@@ -29,7 +29,7 @@ App validates email domain → Session created → Access granted
 ## Authentication Flow
 
 ### 1. User Access
-- User navigates to: `https://main.d2baofxalff7ki.amplifyapp.com`
+- User navigates to: `https://your-amplify-url.amplifyapp.com`
 - Middleware detects no session
 - Redirects to `/auth/signin`
 
@@ -62,18 +62,18 @@ App validates email domain → Session created → Access granted
 
 | Variable | Value | Purpose |
 |----------|-------|---------|
-| `MICROSOFT_CLIENT_ID` | `6a4e7950-9c5d-4ee7-b644-8d1f86235d8d` | Azure AD App Client ID |
-| `MICROSOFT_CLIENT_SECRET` | `[hidden]` | Azure AD App Client Secret |
-| `MICROSOFT_TENANT_ID` | `2fdb7e27-9b62-44f7-a0fe-9836eaa1f161` | Sky UK Azure AD Tenant ID |
-| `NEXTAUTH_SECRET` | `[hidden]` | Session encryption key |
-| `NEXTAUTH_URL` | `https://main.d2baofxalff7ki.amplifyapp.com` | Application URL |
+| `MICROSOFT_CLIENT_ID` | `<your-azure-app-client-id>` | Azure AD App Client ID |
+| `MICROSOFT_CLIENT_SECRET` | `<your-azure-app-client-secret>` | Azure AD App Client Secret |
+| `MICROSOFT_TENANT_ID` | `<your-azure-tenant-id>` | Sky UK Azure AD Tenant ID |
+| `NEXTAUTH_SECRET` | `<your-generated-32-char-secret>` | Session encryption key |
+| `NEXTAUTH_URL` | `https://your-amplify-url.amplifyapp.com` | Application URL |
 
 ### Azure AD App Registration Settings
 
 In your Azure AD App Registration:
 
 1. **Redirect URIs**
-   - `https://main.d2baofxalff7ki.amplifyapp.com/api/auth/callback/azure-ad`
+   - `https://your-amplify-url.amplifyapp.com/api/auth/callback/azure-ad`
 
 2. **API Permissions**
    - `User.Read` (Delegated)
@@ -102,7 +102,7 @@ In your Azure AD App Registration:
 To verify MFA is working:
 
 1. Clear your browser cookies/cache
-2. Visit: `https://main.d2baofxalff7ki.amplifyapp.com`
+2. Visit: `https://your-amplify-url.amplifyapp.com`
 3. Sign in with your @sky.uk or @3dflyingmonsters.co.uk account
 4. **You should be prompted for MFA** (SMS, app approval, etc.)
 5. Complete MFA challenge
@@ -125,7 +125,7 @@ Available MFA methods:
 
 Visit the test endpoint:
 ```
-https://main.d2baofxalff7ki.amplifyapp.com/api/auth/test
+https://your-amplify-url.amplifyapp.com/api/auth/test
 ```
 
 You should see:
@@ -138,7 +138,7 @@ You should see:
     "hasClientSecret": true,
     "hasTenantId": true,
     "hasNextAuthSecret": true,
-    "nextAuthUrl": "https://main.d2baofxalff7ki.amplifyapp.com"
+    "nextAuthUrl": "https://your-amplify-url.amplifyapp.com"
   }
 }
 ```
@@ -148,7 +148,7 @@ All values should be `true`.
 ### Test Full Authentication Flow
 
 1. Open incognito/private browser window
-2. Navigate to: `https://main.d2baofxalff7ki.amplifyapp.com/communications`
+2. Navigate to: `https://your-amplify-url.amplifyapp.com/communications`
 3. You should be redirected to `/auth/signin`
 4. Click "Sign in with Microsoft"
 5. Enter your @sky.uk or @3dflyingmonsters.co.uk email
