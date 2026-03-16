@@ -762,6 +762,10 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
   }
 
   const generateEmailHTML = () => {
+    // Use absolute URL for the logo so it displays correctly in emails
+    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://main.d2baofxalff7ki.amplifyapp.com'
+    const logoUrl = `${baseUrl}/images/platform-engineering-header.png`
+    
     const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -857,7 +861,7 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
                     
                     <tr>
                         <td style="background-color: #f3f4f6; padding: 16px; text-align: center; border-radius: 0 0 8px 8px;">
-                            <img src="/images/image.png" alt="Group Platform Engineering" style="max-width: 100%; height: auto; display: block; margin: 0 auto 8px auto;" />
+                            <img src="${logoUrl}" alt="Group Platform Engineering" style="max-width: 200px; height: auto; display: block; margin: 0 auto 8px auto;" />
                             <p style="margin: 0; color: #6b7280; font-size: 14px; font-family: Arial, Helvetica, sans-serif; line-height: 1.4;">Group Platform Engineering • ${new Date().toLocaleDateString()}</p>
                         </td>
                     </tr>
