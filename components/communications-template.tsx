@@ -203,8 +203,9 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
         provider: emailSettings.provider,
       })
 
-      // Call the API
-      const response = await fetch("/api/send-email", {
+      // Call the API - use absolute URL to avoid parsing issues on Amplify
+      const apiUrl = `${window.location.origin}/api/send-email`
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
