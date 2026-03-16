@@ -40,7 +40,7 @@ After setting/changing environment variables in Amplify:
 ### 4. Expected Output
 
 When working correctly, `/api/debug/all-env` should show:
-```json
+\`\`\`json
 {
   "NEXTAUTH_SECRET": { "exists": true, "length": 44 },
   "NEXTAUTH_URL": { "exists": true, "length": 45 },
@@ -48,7 +48,7 @@ When working correctly, `/api/debug/all-env` should show:
   "MICROSOFT_CLIENT_SECRET": { "exists": true, "length": 40 },
   "MICROSOFT_TENANT_ID": { "exists": true, "length": 36 }
 }
-```
+\`\`\`
 
 ### 5. If Variables Still Don't Load
 

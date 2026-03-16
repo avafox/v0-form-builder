@@ -9,12 +9,12 @@ Your form builder requires Azure AD authentication with MFA for all Sky UK users
 ### 1. Check Environment Variables in Runtime
 
 Visit this URL in your deployed app:
-```
+\`\`\`
 https://main.d2baofxalff7ki.amplifyapp.com/api/auth/test-config
-```
+\`\`\`
 
 You should see:
-```json
+\`\`\`json
 {
   "hasNextAuthSecret": true,
   "hasNextAuthUrl": true,
@@ -24,7 +24,7 @@ You should see:
   "nextAuthUrl": "https://main.d2baofxalff7ki.amplifyapp.com",
   "nodeEnv": "production"
 }
-```
+\`\`\`
 
 If any value is `false`, the environment variable is not loaded at runtime.
 

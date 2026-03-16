@@ -18,7 +18,7 @@ Communication management system for GPE team at Sky UK. Enables creating and sen
 
 ## Architecture Diagram
 
-```
+\`\`\`
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         FORM BUILDER APP                            │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -31,7 +31,7 @@ Communication management system for GPE team at Sky UK. Enables creating and sen
 │       (Auth)       (Email)       (DB)          (Cache)            │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
-```
+\`\`\`
 
 ## Key Architecture Decisions
 
@@ -59,7 +59,7 @@ Standard AWS SDK fails in Amplify's serverless environment. Our custom implement
 
 ## Project Structure
 
-```
+\`\`\`
 /app
   /api
     /send-email        # AWS SES email endpoint
@@ -84,27 +84,27 @@ Standard AWS SDK fails in Amplify's serverless environment. Our custom implement
   ARCHITECTURE.md      # This file
   DEPLOYMENT.md        # Deployment guide
   SBOM-SECURITY-ANALYSIS.md  # OSS compliance
-```
+\`\`\`
 
 ## Data Flows
 
 ### Authentication Flow
 
-```
+\`\`\`
 User → Azure AD Login → OAuth Token → Email Domain Check → Access Granted/Denied
-```
+\`\`\`
 
 ### Email Sending Flow
 
-```
+\`\`\`
 User → Form → generateEmailHTML() → /api/send-email → AWS SES → Sky UK Recipient
-```
+\`\`\`
 
 ### Data Storage Flow
 
-```
+\`\`\`
 User → Form → Supabase (communications table) → Redis Cache (optional)
-```
+\`\`\`
 
 ## Environment Variables
 

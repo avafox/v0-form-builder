@@ -50,12 +50,12 @@ After deploying:
 
 ### Issue: Still showing `allEnvKeys: []`
 **Solution:** The `.env.production` file needs to be included in artifacts. Check amplify.yml has:
-```yaml
+\`\`\`yaml
 artifacts:
   files:
     - '**/*'
     - .env.production
-```
+\`\`\`
 
 ### Issue: Variables show in build logs but not at runtime
 **Solution:** Amplify's SSR deployments require `.env.production` to be in the artifacts AND at the root of the deployment, not in `.next/` directory.
@@ -69,9 +69,9 @@ artifacts:
 ## Azure AD Redirect URI
 
 Ensure your Azure AD App Registration has this redirect URI:
-```
+\`\`\`
 https://your-amplify-url.amplifyapp.com/api/auth/callback/azure-ad
-```
+\`\`\`
 
 ## Admin Consent
 

@@ -3,14 +3,14 @@
 ## Step 1: Check Environment Variables in Amplify
 
 Visit this URL on your deployed Amplify app:
-```
+\`\`\`
 https://main.d2baofxalff7ki.amplifyapp.com/api/debug/azure-check
-```
+\`\`\`
 
 This will show you exactly which environment variables are loaded at runtime.
 
 **Expected output:**
-```json
+\`\`\`json
 {
   "envVars": {
     "NEXTAUTH_SECRET": true,
@@ -21,7 +21,7 @@ This will show you exactly which environment variables are loaded at runtime.
   },
   "canAuthenticate": true
 }
-```
+\`\`\`
 
 ## Step 2: Verify Amplify Environment Variables
 
@@ -43,9 +43,9 @@ In Azure Portal → Microsoft Entra ID → App Registrations:
 
 ### Redirect URIs
 Under **Authentication**, ensure this exact URI is added:
-```
+\`\`\`
 https://main.d2baofxalff7ki.amplifyapp.com/api/auth/callback/azure-ad
-```
+\`\`\`
 
 ### API Permissions
 Verify these permissions are granted:

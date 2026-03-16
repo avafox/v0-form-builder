@@ -13,12 +13,12 @@ The most common cause in AWS Amplify is **environment variables not being availa
 ### Step 1: Check Environment Variables are Loaded
 
 Visit this URL in your browser:
-```
+\`\`\`
 https://main.d2baofxalff7ki.amplifyapp.com/api/auth/check-env
-```
+\`\`\`
 
 You should see:
-```json
+\`\`\`json
 {
   "NEXTAUTH_URL": "https://main.d2baofxalff7ki.amplifyapp.com",
   "hasNEXTAUTH_SECRET": true,
@@ -27,14 +27,14 @@ You should see:
   "hasMICROSOFT_TENANT_ID": true,
   "nodeEnv": "production"
 }
-```
+\`\`\`
 
 **If any values show `false`**, the environment variables are not loaded.
 
 ### Step 2: Check Server Logs
 
 In the browser console, you should see:
-```
+\`\`\`
 [v0] NextAuth configuration check: {
   hasClientId: true,
   hasClientSecret: true,
@@ -42,7 +42,7 @@ In the browser console, you should see:
   hasSecret: true,
   nodeEnv: "production"
 }
-```
+\`\`\`
 
 **If any values show `false`**, NextAuth cannot initialize properly.
 

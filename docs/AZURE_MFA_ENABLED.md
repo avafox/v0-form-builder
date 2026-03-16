@@ -60,13 +60,13 @@ MFA is enforced through your **Azure AD Conditional Access policies**, not the a
 
 ## Environment Variables Required
 
-```
+\`\`\`
 MICROSOFT_CLIENT_ID=<your-client-id>
 MICROSOFT_CLIENT_SECRET=<your-client-secret>
 MICROSOFT_TENANT_ID=<your-tenant-id>
 NEXTAUTH_SECRET=<random-32-char-string>
 NEXTAUTH_URL=https://main.d2baofxalff7ki.amplifyapp.com
-```
+\`\`\`
 
 ## Current State
 

@@ -52,7 +52,7 @@ export function CommunicationsTemplate() {
     ccRecipients: "",
     bccRecipients: "",
     customSubject: "",
-    senderEmail: "cti-gpe-communications@sky.uk",
+    senderEmail: "noreply@cti.contact.sky",
     provider: "resend" as "ses" | "resend",
   })
   const [commData, setCommData] = useState<CommunicationData>({

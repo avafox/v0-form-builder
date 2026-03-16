@@ -30,9 +30,9 @@ This allows users to access the communications builder without authentication.
 Go to **Azure Portal → Azure Active Directory → App registrations** and verify:
 
 1. **Redirect URIs** are correctly configured:
-   ```
+   \`\`\`
    https://main.d2baofxalff7ki.amplifyapp.com/api/auth/callback/azure-ad
-   ```
+   \`\`\`
 
 2. **Supported account types**: 
    - Should be "Accounts in this organizational directory only (Sky UK)"
@@ -49,7 +49,7 @@ Go to **Azure Portal → Azure Active Directory → App registrations** and veri
 
 Create a test endpoint to verify Azure AD connectivity:
 
-```typescript
+\`\`\`typescript
 // app/api/test-auth/route.ts
 import { NextResponse } from "next/server"
 
@@ -62,7 +62,7 @@ export async function GET() {
     nextauth_url: process.env.NEXTAUTH_URL || "Missing",
   })
 }
-```
+\`\`\`
 
 Visit: `https://main.d2baofxalff7ki.amplifyapp.com/api/test-auth`
 

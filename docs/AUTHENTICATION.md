@@ -34,7 +34,7 @@ MFA is configured **in your Azure AD tenant**, not in the application code. The 
 
 If your organization doesn't have a blanket MFA policy, you can force MFA at the application level by uncommenting this line in `auth-options.ts`:
 
-```typescript
+\`\`\`typescript
 authorization: {
   params: {
     scope: "openid profile email User.Read",
@@ -42,7 +42,7 @@ authorization: {
     acr_values: "urn:microsoft:req1", // Uncomment to require MFA
   },
 }
-```
+\`\`\`
 
 **Note:** This requires the application to have the appropriate permissions in Azure AD.
 
@@ -65,13 +65,13 @@ The following routes require authentication:
 
 ### Environment Variables Required
 
-```env
+\`\`\`env
 MICROSOFT_CLIENT_ID=your-azure-app-client-id
 MICROSOFT_CLIENT_SECRET=your-azure-app-client-secret
 MICROSOFT_TENANT_ID=your-azure-tenant-id
 NEXTAUTH_SECRET=your-random-secret
 NEXTAUTH_URL=https://main.d2baofxalff7ki.amplifyapp.com
-```
+\`\`\`
 
 ### Testing MFA
 
