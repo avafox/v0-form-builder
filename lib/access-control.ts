@@ -3,6 +3,7 @@
 // Allowed email domains - users with these domains can sign in
 export const ALLOWED_DOMAINS = [
   "sky.uk", // Primary Sky UK employees
+  "cti.contact.sky", // CTI Contact Sky domain
   "3dflyingmonsters.co.uk", // Test domain for Azure test users
   // Add more domains here as needed:
   // "partner-company.com",
