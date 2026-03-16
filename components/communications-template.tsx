@@ -762,9 +762,9 @@ Group Platform Engineering • ${new Date().toLocaleDateString()}
   }
 
   const generateEmailHTML = () => {
-    // Use absolute URL for the logo so it displays correctly in emails
-    const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://main.d2baofxalff7ki.amplifyapp.com'
-    const logoUrl = `${baseUrl}/images/platform-engineering-header.png`
+    // Use the Amplify production URL for the logo so it displays correctly in emails
+    // This must be an absolute URL that email clients can fetch
+    const logoUrl = 'https://main.d2baofxalff7ki.amplifyapp.com/images/platform-engineering-header.png'
     
     const html = `
 <!DOCTYPE html>
