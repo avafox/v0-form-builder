@@ -34,7 +34,9 @@ export function EmailSender({ htmlContent, subject }: EmailSenderProps) {
     setStatus("idle")
 
     try {
-      const response = await fetch("/api/send-email", {
+      // Use absolute URL to avoid parsing issues on Amplify
+      const apiUrl = `${window.location.origin}/api/send-email`
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
