@@ -181,15 +181,15 @@ These are external services the application connects to:
 
 Run the following command to check for known vulnerabilities:
 
-```bash
+\`\`\`bash
 npm audit
-```
+\`\`\`
 
 For production deployments:
 
-```bash
+\`\`\`bash
 npm audit --production
-```
+\`\`\`
 
 ---
 

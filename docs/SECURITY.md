@@ -19,7 +19,7 @@ This document outlines the security measures implemented in the GPE Communicatio
 
 ### Access Control Layers
 
-```
+\`\`\`
 Layer 1: Azure AD Authentication
     └── User must have valid Sky UK Microsoft account
 
@@ -28,17 +28,17 @@ Layer 2: Email Domain Restriction
 
 Layer 3: Email Whitelist (Optional)
     └── Specific team members can be whitelisted
-```
+\`\`\`
 
 ### Configuration
 
-```env
+\`\`\`env
 # Domain restriction (all @sky.uk users)
 ALLOWED_EMAIL_DOMAINS=sky.uk
 
 # Specific user whitelist (optional, comma-separated)
 ALLOWED_EMAILS=user1@sky.uk,user2@sky.uk,user3@sky.uk
-```
+\`\`\`
 
 ---
 
@@ -48,13 +48,13 @@ ALLOWED_EMAILS=user1@sky.uk,user2@sky.uk,user3@sky.uk
 
 Restrict access to specific IP addresses or ranges (e.g., Sky UK office networks).
 
-```env
+\`\`\`env
 # Enable IP restriction
 ENABLE_IP_RESTRICTION=true
 
 # Allowed IP addresses/ranges (CIDR notation supported)
 ALLOWED_IP_RANGES=10.0.0.0/8,192.168.1.0/24,203.0.113.50
-```
+\`\`\`
 
 ### Security Headers
 

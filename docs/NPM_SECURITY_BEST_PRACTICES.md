@@ -17,11 +17,11 @@ All dependencies in `package.json` now use **exact versions** (no `^` or `~`):
 
 ### 3. Automated Security Audits
 Added npm scripts for security monitoring:
-```bash
+\`\`\`bash
 npm run audit              # Check for vulnerabilities (moderate+)
 npm run audit:fix          # Auto-fix vulnerabilities where possible
 npm run security-check     # Audit + outdated package report
-```
+\`\`\`
 
 ### 4. Build-Time Security Checks
 Amplify builds now:

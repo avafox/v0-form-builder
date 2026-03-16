@@ -58,19 +58,19 @@
 ## Environment Setup
 
 ### Required Environment Variables (Amplify)
-```
+\`\`\`
 AWS_SES_FROM_EMAIL=cti-gpe-communications@sky.uk
 AWS_SES_FROM_NAME=GPE Communications Team
 SES_REGION=eu-west-2
 SES_ACCESS_KEY_ID=<configured>
 SES_SECRET_ACCESS_KEY=<configured>
-```
+\`\`\`
 
 ### Optional Environment Variables
-```
+\`\`\`
 ENABLE_IP_RESTRICTION=false
 ALLOWED_IP_RANGES=<Sky UK office IPs>
-```
+\`\`\`
 
 ## Access
 

@@ -46,7 +46,7 @@ This directory contains comprehensive documentation for the GPE Communications T
 - MFA enforcement via Azure AD Conditional Access policies
 
 ### 📋 Key Environment Variables Required
-```bash
+\`\`\`bash
 # Authentication (Critical)
 NEXTAUTH_SECRET=<32-char-secret>
 NEXTAUTH_URL=https://main.d2baofxalff7ki.amplifyapp.com
@@ -60,7 +60,7 @@ SES_SECRET_ACCESS_KEY=<aws-secret>
 SES_REGION=eu-west-2
 SES_FROM_EMAIL=cti-gpe-communications@sky.uk
 SES_FROM_NAME=GPE Communications Team
-```
+\`\`\`
 
 ## Diagnostic Tools
 

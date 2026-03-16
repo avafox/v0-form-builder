@@ -12,12 +12,12 @@ Sky UK restricts `@sky.uk` emails to on-premise servers only. The `@contact.sky`
 
 ### Email Flow
 
-```
+\`\`\`
 Form Builder App (Amplify)
     → AWS SES API (eu-west-2)
         → Sends from: noreply@contact.sky (or your verified address)
             → Delivered to: @sky.uk internal addresses
-```
+\`\`\`
 
 ---
 
@@ -38,7 +38,7 @@ Form Builder App (Amplify)
 
 Set these in **AWS Amplify Console > Environment Variables**:
 
-```bash
+\`\`\`bash
 # AWS SES Configuration
 SES_ACCESS_KEY_ID=your-iam-access-key
 SES_SECRET_ACCESS_KEY=your-iam-secret-key
@@ -50,7 +50,7 @@ SES_FROM_NAME=GPE Communications Team
 
 # Default email provider
 EMAIL_PROVIDER=ses
-```
+\`\`\`
 
 ### AWS SES Console Setup
 
@@ -123,7 +123,7 @@ The `@contact.sky` domain was created by Sky to allow authorized third parties t
 
 If you need SMTP instead of SES API:
 
-```bash
+\`\`\`bash
 EMAIL_METHOD=smtp
 SMTP_HOST=email-smtp.eu-west-2.amazonaws.com
 SMTP_PORT=587
@@ -131,6 +131,6 @@ SMTP_USER=your-ses-smtp-user
 SMTP_PASS=your-ses-smtp-password
 SMTP_FROM_EMAIL=gpe-communications@contact.sky
 SMTP_FROM_NAME=GPE Communications Team
-```
+\`\`\`
 
 **Note:** SMTP credentials are different from IAM credentials. Generate them in SES Console > SMTP settings.

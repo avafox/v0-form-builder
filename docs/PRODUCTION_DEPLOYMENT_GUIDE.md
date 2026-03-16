@@ -95,9 +95,9 @@ Complete guide to deploy the Form Builder application to production with Azure A
 ### Step 5: Verify Redirect URIs
 
 Ensure these redirect URIs are added under **Authentication** → **Web**:
-```
+\`\`\`
 https://your-production-domain.amplifyapp.com/api/auth/callback/azure-ad
-```
+\`\`\`
 
 ---
 
@@ -123,38 +123,38 @@ https://your-production-domain.amplifyapp.com/api/auth/callback/azure-ad
 In **Amplify Console** → **Environment variables**, add:
 
 #### Authentication Variables
-```
+\`\`\`
 NEXTAUTH_SECRET=<generate-new-production-secret>
 NEXTAUTH_URL=https://your-production-domain.amplifyapp.com
 MICROSOFT_CLIENT_ID=<from-azure-step-1.3>
 MICROSOFT_CLIENT_SECRET=<from-azure-step-2.3>
 MICROSOFT_TENANT_ID=<from-azure-step-1.4>
-```
+\`\`\`
 
 **Generate NEXTAUTH_SECRET:**
 - Online: https://generate-secret.vercel.app/32
 - Or CLI: `openssl rand -base64 32`
 
 #### Email Variables (AWS SES)
-```
+\`\`\`
 SES_FROM_EMAIL=gpe-communications@contact.sky
 SES_FROM_NAME=GPE Communications Team
 SES_REGION=eu-west-2
 SES_ACCESS_KEY_ID=<your-production-ses-access-key>
 SES_SECRET_ACCESS_KEY=<your-production-ses-secret-key>
-```
+\`\`\`
 
 #### Access Control (Optional)
-```
+\`\`\`
 ALLOWED_EMAIL_DOMAINS=sky.uk
 ALLOWED_EMAILS=user1@sky.uk,user2@sky.uk
-```
+\`\`\`
 
 #### Security Variables (Optional)
-```
+\`\`\`
 ENABLE_IP_RESTRICTION=true
 ALLOWED_IP_RANGES=<sky-uk-office-ip-ranges>
-```
+\`\`\`
 
 ### Step 3: Configure Custom Domain (Optional but Recommended)
 
@@ -162,13 +162,13 @@ ALLOWED_IP_RANGES=<sky-uk-office-ip-ranges>
 2. **Add domain**: `forms.sky.uk` (or your chosen subdomain)
 3. **Configure DNS** with provided CNAME records in Sky UK's DNS
 4. **Update Azure AD Redirect URI** to use custom domain:
-   ```
+   \`\`\`
    https://forms.sky.uk/api/auth/callback/azure-ad
-   ```
+   \`\`\`
 5. **Update NEXTAUTH_URL** environment variable:
-   ```
+   \`\`\`
    NEXTAUTH_URL=https://forms.sky.uk
-   ```
+   \`\`\`
 
 ---
 
@@ -183,11 +183,11 @@ ALLOWED_IP_RANGES=<sky-uk-office-ip-ranges>
    - **Mail type**: Transactional
    - **Website URL**: Your production Amplify URL
    - **Use case description**: 
-     ```
+     \`\`\`
      Internal corporate communications tool for Sky UK employees.
      Sends formatted HTML email notifications to @sky.uk addresses only.
      Expected volume: ~500 emails/month for internal team communications.
-     ```
+     \`\`\`
 4. Wait for AWS approval (usually 24-48 hours)
 
 ### Step 2: Verify Production Sender Email
@@ -232,11 +232,11 @@ Your Upstash Redis connection is environment-agnostic. Consider:
 **Production-specific Redis instance:**
 1. Create new Upstash database for production
 2. Update environment variables:
-   ```
+   \`\`\`
    KV_URL=<production-redis-url>
    KV_REST_API_URL=<production-rest-api-url>
    KV_REST_API_TOKEN=<production-token>
-   ```
+   \`\`\`
 
 ---
 
@@ -245,16 +245,16 @@ Your Upstash Redis connection is environment-agnostic. Consider:
 ### 1. Enable IP Restriction (Recommended)
 
 **Get Sky UK Office IP Ranges** from IT:
-```
+\`\`\`
 ENABLE_IP_RESTRICTION=true
 ALLOWED_IP_RANGES=10.0.0.0/8,172.16.0.0/12
-```
+\`\`\`
 
 ### 2. Enable Strict Email Whitelisting
 
-```
+\`\`\`
 ALLOWED_EMAILS=ava.foxwell@sky.uk,team-member-1@sky.uk,team-member-2@sky.uk
-```
+\`\`\`
 
 ### 3. Configure Rate Limiting
 
@@ -320,11 +320,11 @@ Already implemented in `middleware.ts`:
 ### Initial Production Deployment
 
 1. **Commit Production Changes**
-   ```bash
+   \`\`\`bash
    git checkout main
    git pull origin main
    # Verify all code is production-ready
-   ```
+   \`\`\`
 
 2. **Deploy to Amplify**
    - Amplify automatically deploys on push to main
@@ -490,7 +490,7 @@ Already implemented in `middleware.ts`:
 
 ## Appendix: Environment Variables Reference
 
-```bash
+\`\`\`bash
 # Authentication (Required)
 NEXTAUTH_SECRET=<32-char-random-string>
 NEXTAUTH_URL=https://your-production-domain.amplifyapp.com
@@ -522,7 +522,7 @@ SUPABASE_ANON_KEY=<from-supabase>
 KV_URL=<from-upstash>
 KV_REST_API_URL=<from-upstash>
 KV_REST_API_TOKEN=<from-upstash>
-```
+\`\`\`
 
 ---
 

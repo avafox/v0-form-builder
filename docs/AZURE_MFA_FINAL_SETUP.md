@@ -20,7 +20,7 @@ The environment variables weren't loading at runtime in AWS Amplify Lambda funct
 After deployment, visit: `https://your-amplify-url.amplifyapp.com/api/debug/azure-check`
 
 You should see:
-```json
+\`\`\`json
 {
   "runtimeConfigVars": {
     "NEXTAUTH_SECRET": true,
@@ -30,7 +30,7 @@ You should see:
   },
   "canAuthenticateViaRuntimeConfig": true
 }
-```
+\`\`\`
 
 ## Testing Authentication
 
@@ -59,13 +59,13 @@ If authentication still fails:
 
 ## Environment Variables Required
 
-```
+\`\`\`
 NEXTAUTH_SECRET=<your-generated-32-char-secret>
 NEXTAUTH_URL=https://your-amplify-url.amplifyapp.com
 MICROSOFT_CLIENT_ID=<your-azure-app-client-id>
 MICROSOFT_CLIENT_SECRET=<your-azure-app-client-secret>
 MICROSOFT_TENANT_ID=<your-azure-tenant-id>
-```
+\`\`\`
 
 ## Authorized Domains
 

@@ -14,7 +14,7 @@ Domain access is managed in `lib/access-control.ts` and can be easily updated.
 
 ## How It Works
 
-```
+\`\`\`
 User visits app → Redirects to /auth/signin → Click "Sign in with Microsoft"
     ↓
 Azure AD Login Page → User enters @sky.uk or @3dflyingmonsters.co.uk email
@@ -24,7 +24,7 @@ Azure AD MFA Challenge → SMS/Authenticator App/Phone Call
 User completes MFA → Azure AD validates → Token issued
     ↓
 App validates email domain → Session created → Access granted
-```
+\`\`\`
 
 ## Authentication Flow
 
@@ -124,12 +124,12 @@ Available MFA methods:
 ### Test Authentication Configuration
 
 Visit the test endpoint:
-```
+\`\`\`
 https://your-amplify-url.amplifyapp.com/api/auth/test
-```
+\`\`\`
 
 You should see:
-```json
+\`\`\`json
 {
   "status": "ok",
   "message": "NextAuth configuration test",
@@ -141,7 +141,7 @@ You should see:
     "nextAuthUrl": "https://your-amplify-url.amplifyapp.com"
   }
 }
-```
+\`\`\`
 
 All values should be `true`.
 
@@ -211,12 +211,12 @@ All values should be `true`.
 
 **Solution**:
 To change session duration, update `auth-options.ts`:
-```typescript
+\`\`\`typescript
 session: {
   strategy: "jwt",
   maxAge: 24 * 60 * 60, // 24 hours
 }
-```
+\`\`\`
 
 ## Important Notes
 

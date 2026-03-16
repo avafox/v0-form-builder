@@ -6,25 +6,25 @@ Add these to **AWS Amplify Console → Environment Variables**:
 
 ### 1. NextAuth Configuration
 
-```env
+\`\`\`env
 NEXTAUTH_SECRET=<generate-random-32-char-string>
 NEXTAUTH_URL=https://main.d2baofxalff7ki.amplifyapp.com
-```
+\`\`\`
 
 **Generate NEXTAUTH_SECRET:**
-```bash
+\`\`\`bash
 openssl rand -base64 32
-```
+\`\`\`
 
 Or use: https://generate-secret.vercel.app/32
 
 ### 2. Azure AD Credentials (Already Set)
 
-```env
+\`\`\`env
 MICROSOFT_CLIENT_ID=<your-value>
 MICROSOFT_CLIENT_SECRET=<your-value>
 MICROSOFT_TENANT_ID=<your-value>
-```
+\`\`\`
 
 ## Current Status
 
@@ -44,10 +44,10 @@ MICROSOFT_TENANT_ID=<your-value>
 2. Select your app
 3. Click: **Hosting** → **Environment variables**
 4. Add:
-   ```
+   \`\`\`
    NEXTAUTH_SECRET = <paste generated secret>
    NEXTAUTH_URL = https://main.d2baofxalff7ki.amplifyapp.com
-   ```
+   \`\`\`
 
 ### Step 2: Redeploy
 
@@ -103,6 +103,6 @@ MFA is enforced by your Azure AD tenant policies. This app doesn't control MFA -
 - All authentication cookies are HTTP-only and secure
 
 </markdown>
-```
+\`\`\`
 
-```typescript file="" isHidden
+\`\`\`typescript file="" isHidden
