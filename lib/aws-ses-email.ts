@@ -80,6 +80,9 @@ export class AWSSESEmailService {
         ? `${this.config.fromName} <${this.config.fromEmail}>`
         : this.config.fromEmail
 
+      // No-reply address for Reply-To header
+      const noReplyEmail = "no-reply@cti.contact.sky"
+
       const requestBody = JSON.stringify({
         Content: {
           Simple: {
@@ -100,6 +103,7 @@ export class AWSSESEmailService {
           ...(emailData.cc && emailData.cc.length > 0 ? { CcAddresses: emailData.cc } : {}),
         },
         FromEmailAddress: sourceEmail,
+        ReplyToAddresses: [noReplyEmail],
       })
 
       console.log("[v0] Request body prepared, length:", requestBody.length)
